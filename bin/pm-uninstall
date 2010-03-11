@@ -31,7 +31,7 @@ for my $module (@modules) {
                 unlink $_ or warn "$_: $!\n" unless $opt->{dry_run};
             }
             close $fh;
-            unlink $packlist or warn "$packlist: $!\n";
+            unlink $packlist or warn "$packlist: $!\n" unless $opt->{dry_run};
             last;
         }
     }
