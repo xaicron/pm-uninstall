@@ -1,11 +1,11 @@
-This is Perl module App::moduleuninstall.
+This is Perl module App::pmuninstall.
 
 INSTALLATION
 
-App::moduleuninstall installation is straightforward. If your CPAN shell is set up,
+App::pmuninstall installation is straightforward. If your CPAN shell is set up,
 you should just be able to do
 
-    % cpan App::moduleuninstall
+    % cpan App::pmuninstall
 
 Download it, unpack it, then build it as per the usual:
 
@@ -18,9 +18,9 @@ Then install it:
 
 DOCUMENTATION
 
-App::moduleuninstall documentation is available as in POD. So you can do:
+App::pmuninstall documentation is available as in POD. So you can do:
 
-    % perldoc App::moduleuninstall
+    % perldoc App::pmuninstall
 
 to read the documentation online with your favorite pager.
 
