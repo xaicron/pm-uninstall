@@ -7,4 +7,4 @@ all_pod_files_spelling_ok('lib');
 __DATA__
 Yuji Shimada
 xaicron@cpan.org
-App::moduleuninstall
+App::pmuninstall
