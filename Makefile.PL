@@ -1,13 +1,13 @@
-use inc::Module::Install;
-name 'App-moduleuninstall';
-all_from 'lib/App/moduleuninstall.pm';
+use ExtUtils::MakeMaker;
+WriteMakefile(
+    NAME => 'App::pmuninstall',
+    VERSION_FROM => 'lib/App/pmuninstall.pm',
+    ABSTRACT => 'Uninstall modules.',
+    PREREQ_PM => {
+        'ExtUtils::MakeMaker' => 6.31,
+        'ExtUtils::Install' => 1.43,
+    },
+    LICENSE => 'perl',
+    EXE_FILES => [ 'bin/pm-uninstall' ],
+);
 
-# requires '';
-
-tests 't/*.t';
-author_tests 'xt';
-
-test_requires 'Test::More';
-auto_set_repository;
-auto_include;
-WriteAll;

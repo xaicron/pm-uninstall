@@ -1,0 +1,53 @@
+#!perl
+
+use strict;
+use warnings;
+use File::Spec;
+use Getopt::Long qw/GetOptions/;
+use Pod::Usage qw/pod2usage/;
+
+our $VERSION = 0.01;
+
+my $opt = +{};
+GetOptions(
+    'v|verbose!' => \$opt->{verbose},
+    'd|dry-run!' => \$opt->{dry_run},
+    'h|help!'    => \$opt->{help},
+);
+my @modules = map { s|::|/|g; $_ } @ARGV;
+pod2usage 1 if $opt->{help} or scalar @modules <= 0;
+
+for my $module (@modules) {
+    print "Uninstalling $module\n";
+    my $is_installed;
+    for my $lib (@INC) {
+        my $packlist = File::Spec->catfile("$lib/auto/$module/.packlist"); 
+        if (-f $packlist) {
+            $is_installed = 1;
+            open my $fh, '<', $packlist or die "$packlist: $!";
+            while (<$fh>) {
+                chomp;
+                print -f $_ ? 'unlink   ' : 'not found', " : $_\n" if $opt->{verbose};
+                unlink $_ or warn "$_: $!\n" unless $opt->{dry_run};
+            }
+            close $fh;
+            unlink $packlist or warn "$packlist: $!\n";
+            last;
+        }
+    }
+    warn "$module not installed\n" unless $is_installed;
+    print "Successfully $module\n" if $is_installed;
+}
+
+__END__
+
+=head1 NAME
+
+    pm-uninstall [options] Module ...
+
+=head1 SYNOPSIS
+
+    -v,--verbose    Truns on chatty output
+    -d,--dry-run    Rehearsal
+    -h,--help       This help message
+
