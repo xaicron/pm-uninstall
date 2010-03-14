@@ -49,11 +49,14 @@ __END__
 
 =head1 NAME
 
-    pm-uninstall [options] Module ...
+  pm-uninstall - Uninstall modules
 
 =head1 SYNOPSIS
 
-    -v,--verbose    Truns on chatty output
-    -d,--dry-run    Rehearsal
-    -h,--help       This help message
+  pm-uninstall [options] Module ...
+
+  options:
+      -v,--verbose    Truns on chatty output
+      -d,--dry-run    Rehearsal
+      -h,--help       This help message
 
