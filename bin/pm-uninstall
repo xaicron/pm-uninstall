@@ -5,44 +5,107 @@ use warnings;
 use File::Spec;
 use Getopt::Long qw/GetOptions/;
 use Pod::Usage qw/pod2usage/;
+use Config;
+use ExtUtils::MakeMaker;
+
+use constant WIN32 => $^O eq 'MSWin32';
+my $quote = WIN32 ? q/"/ : q/'/;
+my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 
 our $VERSION = 0.01;
 
 my $opt = +{};
 GetOptions(
-    'v|verbose!' => \$opt->{verbose},
-    'd|dry-run!' => \$opt->{dry_run},
-    'h|help!'    => \$opt->{help},
+    'v|verbose!'  => \$opt->{verbose},
+    'd|dry-run!'  => \$opt->{dry_run},
+    'dependence!' => \$opt->{dependence},
+    'h|help!'     => \$opt->{help},
 );
 my @modules = map { my $org = $_; s|::|/|g; [$org, $_] } @ARGV;
 pod2usage 1 if $opt->{help} or scalar @modules <= 0;
 
-print "--- dry-run ---\n" if $opt->{dry_run};
+main();
+exit;
 
-for my $module (@modules) {
-    my $module_name = $module->[0];
-    my $module_path = $module->[1];
+sub main {
+    init_tools();
 
-    print "Uninstalling $module_name\n";
+    print "--- dry-run ---\n" if !$opt->{dependence} and $opt->{dry_run};
+    for my $module (@modules) {
+        my $module_name = $module->[0];
+        my $module_path = $module->[1];
 
-    my $is_installed;
-    for my $lib (@INC) {
-        my $packlist = File::Spec->catfile("$lib/auto/$module_path/.packlist"); 
-        if (-f $packlist) {
-            $is_installed = 1;
-            open my $fh, '<', $packlist or die "$packlist: $!";
-            while (<$fh>) {
-                chomp;
-                print -f $_ ? 'unlink   ' : 'not found', " : $_\n" if $opt->{verbose};
-                unlink $_ or warn "$_: $!\n" unless $opt->{dry_run};
+        print "Uninstalling $module_name\n" unless $opt->{dependence};
+
+        my $is_installed;
+        for my $lib (@INC) {
+            my $packlist = File::Spec->catfile("$lib/auto/$module_path/.packlist"); 
+            if (-f $packlist) {
+                open my $fh, '<', $packlist or die "$packlist: $!";
+                while (<$fh>) {
+                    chomp;
+                    if ($opt->{dependence}) {
+                        (my $file = $_) =~ s|\\|/|g;
+                        if (-f $_ and $file =~ m|$module_path\.pm$|) {
+                            my $version = MM->parse_version($_);
+                            (my $dist = $module_name) =~ s/::/-/g;
+                            $dist .= "-$version";
+                            my $content = get("$base_url$dist");
+                            warn "Couldn't get dependence modules from $dist\n" and last unless $content;
+                            print "$dist is depended on by\n";
+                            for my $depended_module ($content =~ m|<th align=left>([^<]+)</th>|smg) {
+                                print "    $depended_module\n";
+                            }
+                            last;
+                        }
+                    }
+                    else {
+                        print -f $_ ? 'unlink   ' : 'not found', " : $_\n" if $opt->{verbose};
+                        unlink $_ or warn "$_: $!\n" unless $opt->{dry_run};
+                    }
+                }
+                close $fh;
+                unlink $packlist or warn "$packlist: $!\n" unless $opt->{dry_run} or $opt->{dependence};
+                $is_installed = 1;
+                last;
             }
-            close $fh;
-            unlink $packlist or warn "$packlist: $!\n" unless $opt->{dry_run};
-            last;
+        }
+        warn "$module_name not installed or .packlist not found\n" unless $is_installed;
+        print "Successfully $module_name\n" if !$opt->{dependence} and $is_installed;
+    }
+}
+
+# taken from cpan-outdated
+sub which {
+    my($name) = @_;
+    my $exe_ext = $Config{_exe};
+    foreach my $dir(File::Spec->path){
+        my $fullpath = File::Spec->catfile($dir, $name);
+        if (-x $fullpath || -x ($fullpath .= $exe_ext)){
+            if ($fullpath =~ /\s/ && $fullpath !~ /^$quote/) {
+                $fullpath = "$quote$fullpath$quote"
+            }
+            return $fullpath;
         }
     }
-    warn "$module_name not installed or .packlist not found\n" unless $is_installed;
-    print "Successfully $module_name\n" if $is_installed;
+    return;
+}
+
+sub init_tools {
+    if (!$ENV{DEBUG_WGET} && eval { require LWP::Simple }) {
+        *get = sub { LWP::Simple::get(@_) };
+    }
+    elsif (my $wget = which('wget')) {
+        *get = sub {
+            my($uri) = @_;
+            open my $fh, "$wget $uri -q -O - |" or die "wget $uri: $!";
+            local $/;
+            <$fh>;
+        };
+    }
+    else {
+        die "Cannot find LWP::Simple and wget.\n";
+    }
 }
 
 __END__
@@ -59,4 +122,6 @@ __END__
       -v,--verbose    Truns on chatty output
       -d,--dry-run    Rehearsal
       -h,--help       This help message
+      
+      --dependence    Show the module dependency.
 
