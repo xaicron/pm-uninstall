@@ -12,7 +12,7 @@ use constant WIN32 => $^O eq 'MSWin32';
 my $quote = WIN32 ? q/"/ : q/'/;
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 
-our $VERSION = 0.01;
+our $VERSION = "0.02_01";
 
 my $opt = +{};
 GetOptions(

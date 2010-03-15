@@ -1,7 +1,7 @@
 package App::pmuninstall;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = "0.02_01";
 
 1;
 __END__
