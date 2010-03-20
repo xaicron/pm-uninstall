@@ -11,6 +11,7 @@ use ExtUtils::MakeMaker;
 use constant WIN32 => $^O eq 'MSWin32';
 my $quote = WIN32 ? q/"/ : q/'/;
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
+my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 
 our $VERSION = "0.02_01";
 
@@ -47,9 +48,14 @@ sub main {
                     if ($opt->{dependence}) {
                         (my $file = $_) =~ s|\\|/|g;
                         if (-f $_ and $file =~ m|$module_path\.pm$|) {
+                            my $yaml = get("$cpanmetadb/$module_name"); 
+                            eval "use Parse::CPAN::Meta; 1" or die "Cannot required Parse::CPAN::Meta.\n";
+                            my $meta = parse_meta_string($yaml);
+                            die "Couldn't finding $module on cpanmetadb failed.\n" unless $meta->{distfile};
+                            (my $dist_name = $meta->{distfile}) =~ s{\w+/\w+/\w+/([\w.-]+)-[\w.]+\.(?:tar\.(?:gz|bz|bz2)|zip)}{$1};
+
                             my $version = MM->parse_version($_);
-                            (my $dist = $module_name) =~ s/::/-/g;
-                            $dist .= "-$version";
+                            my $dist .= "$dist_name-$version";
                             my $content = get("$base_url$dist");
                             warn "Couldn't get dependence modules from $dist\n" and last unless $content;
                             print "$dist is depended on by\n";
@@ -106,6 +112,11 @@ sub init_tools {
     else {
         die "Cannot find LWP::Simple and wget.\n";
     }
+}
+
+sub parse_meta_string {
+    my $yaml = shift;
+    return eval { (Parse::CPAN::Meta::Load($yaml))[0] } || {};
 }
 
 __END__
