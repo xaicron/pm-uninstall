@@ -1,7 +1,7 @@
 package App::pmuninstall;
 use strict;
 use warnings;
-our $VERSION = "0.02_01";
+our $VERSION = "0.3";
 
 1;
 __END__
@@ -18,6 +18,7 @@ delete files from B<.packlist>.
 =head1 AUTHOR
 
 Yuji Shimada E<lt>xaicron@cpan.orgE<gt>
+Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
 
 =head1 SEE ALSO
 
