@@ -7,9 +7,10 @@ use Getopt::Long qw/GetOptions/;
 use Pod::Usage qw/pod2usage/;
 use Config;
 use ExtUtils::MakeMaker;
+use LWP::Simple;
+use YAML;
+use CPAN::DistnameInfo;
 
-use constant WIN32 => $^O eq 'MSWin32';
-my $quote = WIN32 ? q/"/ : q/'/;
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 
@@ -17,106 +18,125 @@ our $VERSION = "0.02_01";
 
 my $opt = +{};
 GetOptions(
+    'f|force'     => \$opt->{force},
     'v|verbose!'  => \$opt->{verbose},
-    'd|dry-run!'  => \$opt->{dry_run},
-    'dependence!' => \$opt->{dependence},
+    'c|checkdeps' => \$opt->{check_deps},
     'h|help!'     => \$opt->{help},
 );
-my @modules = map { my $org = $_; s|::|/|g; [$org, $_] } @ARGV;
-pod2usage 1 if $opt->{help} or scalar @modules <= 0;
 
-main();
+pod2usage 1 if $opt->{help} or !@ARGV;
+
+main(@ARGV);
 exit;
 
 sub main {
-    init_tools();
-
-    print "--- dry-run ---\n" if !$opt->{dependence} and $opt->{dry_run};
+    my @modules = @_;
     for my $module (@modules) {
-        my $module_name = $module->[0];
-        my $module_path = $module->[1];
-
-        print "Uninstalling $module_name\n" unless $opt->{dependence};
-
-        my $is_installed;
-        for my $lib (@INC) {
-            my $packlist = File::Spec->catfile("$lib/auto/$module_path/.packlist"); 
-            if (-f $packlist) {
-                open my $fh, '<', $packlist or die "$packlist: $!";
-                while (<$fh>) {
-                    chomp;
-                    if ($opt->{dependence}) {
-                        (my $file = $_) =~ s|\\|/|g;
-                        if (-f $_ and $file =~ m|$module_path\.pm$|) {
-                            my $yaml = get("$cpanmetadb/$module_name"); 
-                            eval "use Parse::CPAN::Meta; 1" or die "Cannot required Parse::CPAN::Meta.\n";
-                            my $meta = parse_meta_string($yaml);
-                            die "Couldn't finding $module on cpanmetadb failed.\n" unless $meta->{distfile};
-                            (my $dist_name = $meta->{distfile}) =~ s{\w+/\w+/\w+/([\w.-]+)-[\w.]+\.(?:tar\.(?:gz|bz|bz2)|zip)}{$1};
-
-                            my $version = MM->parse_version($_);
-                            my $dist .= "$dist_name-$version";
-                            my $content = get("$base_url$dist");
-                            warn "Couldn't get dependence modules from $dist\n" and last unless $content;
-                            print "$dist is depended on by\n";
-                            for my $depended_module ($content =~ m|<th align=left>([^<]+)</th>|smg) {
-                                print "    $depended_module\n";
-                            }
-                            last;
-                        }
-                    }
-                    else {
-                        print -f $_ ? 'unlink   ' : 'not found', " : $_\n" if $opt->{verbose};
-                        unlink $_ or warn "$_: $!\n" unless $opt->{dry_run};
-                    }
-                }
-                close $fh;
-                unlink $packlist or warn "$packlist: $!\n" unless $opt->{dry_run} or $opt->{dependence};
-                $is_installed = 1;
-                last;
-            }
+        my($packlist, $dist, $vname) = find_packlist($module);
+        unless ($packlist) {
+            warn "Module $module not installed\n";
+            next;
         }
-        warn "$module_name not installed or .packlist not found\n" unless $is_installed;
-        print "Successfully $module_name\n" if !$opt->{dependence} and $is_installed;
+
+        if ($opt->{force} or ask_permission($module, $dist, $vname, $packlist)) {
+            uninstall_from_packlist($packlist);
+            warn "Module $module successfully uninstalled.\n";
+        }
     }
 }
 
-# taken from cpan-outdated
-sub which {
-    my($name) = @_;
-    my $exe_ext = $Config{_exe};
-    foreach my $dir(File::Spec->path){
-        my $fullpath = File::Spec->catfile($dir, $name);
-        if (-x $fullpath || -x ($fullpath .= $exe_ext)){
-            if ($fullpath =~ /\s/ && $fullpath !~ /^$quote/) {
-                $fullpath = "$quote$fullpath$quote"
-            }
-            return $fullpath;
+sub vname_for {
+    my $module = shift;
+
+    my $yaml = get("$cpanmetadb/$module") or return;
+    my $meta = YAML::Load($yaml);
+    my $info = CPAN::DistnameInfo->new($meta->{distfile}) or return;
+
+    return $info->distvname;
+}
+
+sub ask_permission {
+    my($module, $dist, $vname, $packlist) = @_;
+
+    my(@deps, %seen);
+    if ($opt->{check_deps}) {
+        $vname = vname_for($module);
+        warn "Checking modules depending on $vname\n" if $opt->{verbose};
+        my $content = get("$base_url$vname");
+        for my $dep ($content =~ m|<th align=left>([^<]+)</th>|smg) {
+            $dep =~ s/\-[^\-]+$//; # version
+            next if $seen{$dep}++;
+            push @deps, $dep if locate_pack($dep);
         }
     }
+
+    warn "$module is included in the distribution $dist and contains:\n\n";
+
+    open my $in, "<", $packlist or die "$packlist: $!";
+    while (<$in>) {
+        warn "  $_";
+    }
+    warn "\n";
+
+    my $default = 'y';
+    if (@deps) {
+        warn "Also, they're depended on by the following dists you have:\n\n";
+        for my $dep (@deps) {
+            warn "  $dep\n";
+        }
+        warn "\n";
+        $default = 'n';
+    }
+
+    lc(prompt("Are you sure to uninstall $dist?", $default)) eq 'y';
+}
+
+sub find_packlist {
+    my $module = shift;
+
+    warn "Finding $module in your \@INC\n" if $opt->{verbose};
+
+    # find with the given name first
+    (my $try_dist = $module) =~ s!::!-!g;
+    my $pl = locate_pack($try_dist);
+    return ($pl, $try_dist) if $pl;
+
+    warn "Looking up $module on cpanmetadb\n" if $opt->{verbose};
+
+    # map module -> dist and retry
+    my $yaml = get("$cpanmetadb/$module") or return;
+    my $meta = YAML::Load($yaml);
+    my $info = CPAN::DistnameInfo->new($meta->{distfile});
+
+    my $pl2 = locate_pack($info->dist);
+    return ($pl2, $info->dist, $info->distvname) if $pl2;
+
     return;
 }
 
-sub init_tools {
-    if (!$ENV{DEBUG_WGET} && eval { require LWP::Simple }) {
-        *get = sub { LWP::Simple::get(@_) };
+sub locate_pack {
+    my $dist = shift;
+    $dist =~ s!-!/!g;
+
+    for my $lib (@INC) {
+        my $packlist = "$lib/auto/$dist/.packlist";
+        return $packlist if -f $packlist && -r _;
     }
-    elsif (my $wget = which('wget')) {
-        *get = sub {
-            my($uri) = @_;
-            open my $fh, "$wget $uri -q -O - |" or die "wget $uri: $!";
-            local $/;
-            <$fh>;
-        };
-    }
-    else {
-        die "Cannot find LWP::Simple and wget.\n";
-    }
+
+    return;
 }
 
-sub parse_meta_string {
-    my $yaml = shift;
-    return eval { (Parse::CPAN::Meta::Load($yaml))[0] } || {};
+sub uninstall_from_packlist {
+    my $packlist = shift;
+
+    open my $fh, '<', $packlist or die "$packlist: $!";
+    while (<$fh>) {
+        chomp;
+        print -f $_ ? 'unlink   ' : 'not found', " : $_\n" if $opt->{verbose};
+        unlink $_ or warn "$_: $!\n";
+    }
+
+    unlink $packlist;
 }
 
 __END__
@@ -130,9 +150,7 @@ __END__
   pm-uninstall [options] Module ...
 
   options:
-      -v,--verbose    Truns on chatty output
-      -d,--dry-run    Rehearsal
+      -v,--verbose    Turns on chatty output
+      -f,--force      Uninstalls without prompts
       -h,--help       This help message
-      
-      --dependence    Show the module dependency.
 
