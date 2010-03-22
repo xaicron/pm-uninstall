@@ -135,6 +135,7 @@ sub uninstall_from_packlist {
         print -f $_ ? 'unlink   ' : 'not found', " : $_\n" if $opt->{verbose};
         unlink $_ or warn "$_: $!\n";
     }
+    close $fh;
 
     unlink $packlist;
 }
