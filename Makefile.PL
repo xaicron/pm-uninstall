@@ -6,6 +6,9 @@ WriteMakefile(
     PREREQ_PM => {
         'ExtUtils::MakeMaker' => 6.31,
         'ExtUtils::Install' => 1.43,
+        'CPAN::DistnameInfo' => 0,
+        'YAML' => 0,
+        'LWP' => 0,
     },
     LICENSE => 'perl',
     EXE_FILES => [ 'bin/pm-uninstall' ],
