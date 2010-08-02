@@ -153,5 +153,6 @@ __END__
   options:
       -v,--verbose    Turns on chatty output
       -f,--force      Uninstalls without prompts
+      -c,--checkdeps  Check dependencies
       -h,--help       This help message
 
