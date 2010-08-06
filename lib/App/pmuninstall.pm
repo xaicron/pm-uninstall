@@ -15,9 +15,44 @@ App::pmuninstall - Uninstall modules
 App::pmuninstall is Fast module uninstaller.
 delete files from B<.packlist>.
 
+=head1 SYNOPSIS
+
+uninstall MODULE
+
+  $ pm-uninstall App::pmuninstall
+
+=head1 OPTIONS
+
+=over
+
+=item -f, --force
+
+Uninstalls without prompts
+
+  $ pm-uninstall -f App::pmuninstall
+
+=item -v, --verbose
+
+Turns on chatty output
+
+  $ pm-uninstall -v CGI
+
+=item -c, --checkdeps
+
+Check dependencies
+
+  $ pm-uninstall -c Plack
+
+=item -h, --help
+
+Show help message
+
+  $ pm-uninstall -h
+
 =head1 AUTHOR
 
 Yuji Shimada
+
 Tatsuhiko Miyagawa
 
 =head1 SEE ALSO
