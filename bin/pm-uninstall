@@ -14,7 +14,7 @@ use CPAN::DistnameInfo;
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 my $opt = +{};
 GetOptions(
