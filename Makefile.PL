@@ -9,6 +9,7 @@ WriteMakefile(
         'CPAN::DistnameInfo' => 0,
         'YAML' => 0,
         'LWP::Simple' => 0,
+        'local::lib' => 0,
     },
     LICENSE => 'perl',
     EXE_FILES => [ 'bin/pm-uninstall' ],
