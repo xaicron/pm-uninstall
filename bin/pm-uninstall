@@ -138,14 +138,12 @@ sub locate_pack {
 sub uninstall_from_packlist {
     my ($packlist, $local_lib_base) = @_;
 
-    open my $fh, '<', $packlist or die "$packlist: $!";
     for my $file (fixup_packilist($packlist, $local_lib_base)) {
         chomp $file;
         print -f $file ? 'unlink   ' : 'not found', " : $file\n" if $opt->{verbose};
         unlink $file or warn "$file: $!\n";
     }
     print "\n" if $opt->{verbose};
-    close $fh;
 
     unlink $packlist;
 }
