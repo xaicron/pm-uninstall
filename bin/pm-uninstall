@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use File::Spec;
+use File::Basename qw/dirname/;
 use Getopt::Long qw/GetOptions :config bundling/;
 use Pod::Usage qw/pod2usage/;
 use Config;
@@ -138,14 +139,21 @@ sub locate_pack {
 sub uninstall_from_packlist {
     my ($packlist, $local_lib_base) = @_;
 
+    my $inc = {
+        map { File::Spec->catfile($_) => 1 } @INC
+    };
+
     for my $file (fixup_packilist($packlist, $local_lib_base)) {
         chomp $file;
         print -f $file ? 'unlink   ' : 'not found', " : $file\n" if $opt->{verbose};
         unlink $file or warn "$file: $!\n";
+        rm_empty_dir_from_file($file, $inc);
     }
-    print "\n" if $opt->{verbose};
-
+    print "unlink    : $packlist\n" if $opt->{verbose};
     unlink $packlist;
+    rm_empty_dir_from_file($packlist, $inc);
+
+    print "\n" if $opt->{verbose};
 }
 
 sub fixup_packilist {
@@ -169,6 +177,27 @@ sub is_local_lib {
     $local_lib_base ||= '~/perl5';
     $local_lib_base = File::Spec->catfile($local_lib_base);
     return $file =~ $local_lib_base ? 1 : 0;
+}
+
+sub is_empty_dir {
+    my ($dir) = @_;
+    opendir my $dh, $dir or die "$dir: $!";
+    my @dir = grep !/^\.{1,2}$/, readdir $dh;
+    closedir $dh;
+    return @dir ? 0 : 1;
+}
+
+sub rm_empty_dir_from_file {
+    my ($file, $inc) = @_;
+    my $dir = dirname $file;
+    return unless -d $dir;
+    return if $inc->{+File::Spec->catfile($dir)};
+
+    if (is_empty_dir($dir)) {
+        print "rmdir     : $dir\n" if $opt->{verbose};
+        rmdir $dir or warn "$dir: $!\n";
+        rm_empty_dir_from_file($dir, $inc);
+    }
 }
 
 # taken from cpan-outdated
