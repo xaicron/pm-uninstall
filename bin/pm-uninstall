@@ -17,11 +17,14 @@ my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 
 our $VERSION = "0.04";
 
-my $opt = +{};
+my $opt = +{
+    check_deps => 1,
+};
 GetOptions(
     'f|force'                 => \$opt->{force},
     'v|verbose!'              => \$opt->{verbose},
-    'c|checkdeps'             => \$opt->{check_deps},
+    'c|checkdeps!'            => \$opt->{check_deps},
+    'n|no-checkdeps!'         => sub { $opt->{check_deps} = 0 },
     'h|help!'                 => \$opt->{help},
     'l|local-lib=s'           => \$opt->{local_lib},
     'L|local-lib-contained=s' => sub {
