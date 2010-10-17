@@ -52,7 +52,7 @@ sub main {
             next;
         }
 
-        if (is_core_module($packlist)) {
+        if ($opt->{force} or is_core_module($packlist)) {
             next if lc(prompt("$dist is Core Module. Are you sure process?", 'n')) eq 'n';
         }
 
