@@ -1,5 +1,9 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.06    Sun Oct 17 23:16:31 2010
+        - --checkdeps option default
+        - check core module
+
 0.05    Fri Oct  8 00:36:10 2010
         - supported local::lib
         - rmdir for empty dir
