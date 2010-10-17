@@ -49,6 +49,10 @@ sub main {
             next;
         }
 
+        if (is_core_module($packlist)) {
+            next if lc(prompt("$dist is Core Module. Are you sure process?", 'n')) eq 'n';
+        }
+
         if ($opt->{force} or ask_permission($module, $dist, $vname, $packlist, $opt->{local_lib})) {
             uninstall_from_packlist($packlist, $opt->{local_lib});
             warn "Module $module successfully uninstalled.\n";
@@ -122,6 +126,16 @@ sub find_packlist {
     my $pl2 = locate_pack($info->dist);
     return ($pl2, $info->dist, $info->distvname) if $pl2;
 
+    return;
+}
+
+sub is_core_module {
+    my ($packlist) = @_;
+    for my $lib (@{[$Config{installprivlib}, $Config{installarchlib}]}) {
+        next unless $lib;
+        $lib = quotemeta $lib;
+        return 1 if $packlist =~ /^$lib/;
+    }
     return;
 }
 
