@@ -11,6 +11,9 @@ use ExtUtils::MakeMaker;
 use LWP::Simple;
 use YAML;
 use CPAN::DistnameInfo;
+use Module::CoreList;
+
+my $perl_version = version->new($^V)->numify;
 
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
@@ -47,13 +50,20 @@ sub main {
 
     for my $module (@modules) {
         my($packlist, $dist, $vname) = find_packlist($module);
-        unless ($packlist) {
-            warn "Module $module not installed\n";
+
+        unless ($dist) {
+            warn "$module is not found.\n";
             next;
         }
 
-        if ($opt->{force} or is_core_module($packlist)) {
-            next if lc(prompt("$dist is Core Module. Are you sure process?", 'n')) eq 'n';
+        if (is_core_module($dist)) {
+            warn "$dist is Core Module!! Can't be uninstall.\n";
+            next;
+        }
+
+        unless ($packlist) {
+            warn "Module $module not installed.\n";
+            next;
         }
 
         if ($opt->{force} or ask_permission($module, $dist, $vname, $packlist, $opt->{local_lib})) {
@@ -92,7 +102,7 @@ sub ask_permission {
     warn "$module is included in the distribution $dist and contains:\n\n";
 
     for (fixup_packilist($packlist, $local_lib_base)) {
-        warn " $_";
+        warn "  $_";
     }
     warn "\n";
 
@@ -127,19 +137,12 @@ sub find_packlist {
     my $info = CPAN::DistnameInfo->new($meta->{distfile});
 
     my $pl2 = locate_pack($info->dist);
-    return ($pl2, $info->dist, $info->distvname) if $pl2;
-
-    return;
+    return ($pl2, $info->dist, $info->distvname);
 }
 
 sub is_core_module {
-    my ($packlist) = @_;
-    for my $lib (@{[$Config{installprivlib}, $Config{installarchlib}]}) {
-        next unless $lib;
-        $lib = quotemeta $lib;
-        return 1 if $packlist =~ /^$lib/;
-    }
-    return;
+    my ($dist) = @_;
+    exists $Module::CoreList::version{$perl_version}{$dist} ? 1 : 0;
 }
 
 sub locate_pack {
