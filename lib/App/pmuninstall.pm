@@ -49,6 +49,12 @@ Show help message
 
   $ pm-uninstall -h
 
+=item -V, --version
+
+Show version
+
+  $ pm-uninstall -V
+
 =item -l, --local-lib
 
 Additional module path
