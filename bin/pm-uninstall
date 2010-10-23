@@ -70,13 +70,13 @@ sub main {
         }
 
         unless ($packlist) {
-            warn "Module $module not installed.\n";
+            warn "$module is not installed.\n";
             next;
         }
 
         if ($opt->{force} or ask_permission($module, $dist, $vname, $packlist, $opt->{local_lib})) {
             uninstall_from_packlist($packlist, $opt->{local_lib});
-            warn "Module $module successfully uninstalled.\n";
+            warn "$module is successfully uninstalled.\n";
         }
     }
 }
