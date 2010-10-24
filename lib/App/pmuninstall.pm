@@ -69,6 +69,8 @@ Additional module path (don't include non-core modules)
 
   $ pm-uninstall -L extlib App::pmuninstall
 
+=back
+
 =head1 AUTHOR
 
 Yuji Shimada
