@@ -1,5 +1,9 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.07    Sun Oct 24 17:56:47 2010
+        - suppressed uninstall for core-module
+        - show mandb message
+
 0.06    Sun Oct 17 23:16:31 2010
         - --checkdeps option default
         - check core module
