@@ -19,6 +19,7 @@ my $perl_version = version->new($^V)->numify;
 
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
+my $uninstalled = 0;
 
 my $opt = +{
     check_deps => 1,
@@ -76,8 +77,13 @@ sub main {
 
         if ($opt->{force} or ask_permission($module, $dist, $vname, $packlist, $opt->{local_lib})) {
             uninstall_from_packlist($packlist, $opt->{local_lib});
-            warn "$module is successfully uninstalled.\n";
+            warn "$module is successfully uninstalled.\n\n";
+            $uninstalled++;
         }
+    }
+
+    if ($uninstalled) {
+        warn "You may want to rebuild man(1) entires. Try `mandb -c` if needed\n"
     }
 }
 
