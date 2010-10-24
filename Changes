@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.08    Mon Oct 25 00:25:53 2010
+        - small changes to the document.
+
 0.07    Sun Oct 24 17:56:47 2010
         - suppressed uninstall for core-module
         - show mandb message
