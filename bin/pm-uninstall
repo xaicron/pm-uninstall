@@ -267,7 +267,8 @@ __END__
   options:
       -v,--verbose                  Turns on chatty output
       -f,--force                    Uninstalls without prompts
-      -c,--checkdeps                Check dependencies
+      -c,--checkdeps                Check dependencies ( default on )
+      -n,--no-checkdeps             Not check dependencies
       -h,--help                     This help message
       -V,--version                  Show version
       -l,--local-lib                Additional module path
