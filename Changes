@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.10    Mon Oct 25 22:10:28 2010
+        - wrote `-n` about the document
+
 0.09    Mon Oct 25 02:19:36 2010
         - fixed syntax error for pod
 
