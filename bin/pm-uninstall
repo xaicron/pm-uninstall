@@ -76,9 +76,13 @@ sub main {
         }
 
         if ($opt->{force} or ask_permission($module, $dist, $vname, $packlist, $opt->{local_lib})) {
-            uninstall_from_packlist($packlist, $opt->{local_lib});
-            warn "$module is successfully uninstalled.\n\n";
-            $uninstalled++;
+            if (uninstall_from_packlist($packlist, $opt->{local_lib})) {
+                warn "$module is successfully uninstalled.\n\n";
+                $uninstalled++;
+            }
+            else {
+                warn "! $module is failed uninstall.\n";
+            }
         }
     }
 
@@ -178,17 +182,20 @@ sub uninstall_from_packlist {
         map { File::Spec->catfile($_) => 1 } @INC
     };
 
+    my $failed;
     for my $file (fixup_packilist($packlist, $local_lib_base)) {
         chomp $file;
         print -f $file ? 'unlink   ' : 'not found', " : $file\n" if $opt->{verbose};
-        unlink $file or warn "$file: $!\n";
-        rm_empty_dir_from_file($file, $inc);
+        unlink $file or warn "$file: $!\n" and $failed++;
+        rm_empty_dir_from_file($file, $inc) or $failed++;
     }
     print "unlink    : $packlist\n" if $opt->{verbose};
-    unlink $packlist;
-    rm_empty_dir_from_file($packlist, $inc);
+    unlink $packlist or warn "$packlist: $!\n" and $failed++;
+    rm_empty_dir_from_file($packlist, $inc) or $failed++;
 
     print "\n" if $opt->{verbose};
+
+    return !$failed;
 }
 
 sub fixup_packilist {
@@ -228,11 +235,14 @@ sub rm_empty_dir_from_file {
     return unless -d $dir;
     return if $inc->{+File::Spec->catfile($dir)};
 
+    my $failed;
     if (is_empty_dir($dir)) {
         print "rmdir     : $dir\n" if $opt->{verbose};
-        rmdir $dir or warn "$dir: $!\n";
+        rmdir $dir or warn "$dir: $!\n" and $failed++;
         rm_empty_dir_from_file($dir, $inc);
     }
+
+    return !$failed;
 }
 
 # taken from cpan-outdated
