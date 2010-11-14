@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.11    Sun Nov 14 22:39:02 2010
+        - fixed wrong message issue. (report by punytan++)
+
 0.10    Mon Oct 25 22:10:28 2010
         - wrote `-n` about the document
 
