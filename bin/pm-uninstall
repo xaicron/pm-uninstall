@@ -10,6 +10,7 @@ use Config;
 use ExtUtils::MakeMaker;
 use LWP::Simple;
 use YAML;
+use YAML::Loader; # workaround for -L
 use CPAN::DistnameInfo;
 use Module::CoreList;
 
