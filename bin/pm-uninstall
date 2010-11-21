@@ -58,15 +58,15 @@ sub main {
     }
 
     for my $module (@modules) {
+        if (is_core_module($module)) {
+            warn "$module is Core Module!! Can't be uninstall.\n";
+            next;
+        }
+
         my($packlist, $dist, $vname) = find_packlist($module);
 
         unless ($dist) {
             warn "$module is not found.\n";
-            next;
-        }
-
-        if (is_core_module($dist)) {
-            warn "$dist is Core Module!! Can't be uninstall.\n";
             next;
         }
 
