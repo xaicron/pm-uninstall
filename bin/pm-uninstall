@@ -196,11 +196,11 @@ sub uninstall_from_packlist {
         chomp $file;
         print -f $file ? 'unlink   ' : 'not found', " : $file\n" if $opt->{verbose};
         unlink $file or warn "$file: $!\n" and $failed++;
-        rm_empty_dir_from_file($file, $inc) or $failed++;
+        rm_empty_dir_from_file($file, $inc);
     }
     print "unlink    : $packlist\n" if $opt->{verbose};
     unlink $packlist or warn "$packlist: $!\n" and $failed++;
-    rm_empty_dir_from_file($packlist, $inc) or $failed++;
+    rm_empty_dir_from_file($packlist, $inc);
 
     print "\n" if $opt->{verbose};
 
@@ -226,8 +226,8 @@ sub is_local_lib {
     return 0 unless exists $INC{'local/lib.pm'};
 
     $local_lib_base ||= '~/perl5';
-    $local_lib_base = File::Spec->catfile($local_lib_base);
-    return $file =~ $local_lib_base ? 1 : 0;
+    $local_lib_base = quotemeta Cwd::realpath(File::Spec->catfile($local_lib_base));
+    return $file =~ /^$local_lib_base/ ? 1 : 0;
 }
 
 sub is_empty_dir {
