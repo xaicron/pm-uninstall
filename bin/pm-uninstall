@@ -13,11 +13,11 @@ use YAML;
 use YAML::Loader; # workaround for -L
 use CPAN::DistnameInfo;
 use Module::CoreList;
+use version;
 
 use App::pmuninstall;
 
-my $perl_version = version->new($^V)->numify;
-
+my $perl_version = version->new($])->numify;
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 my $uninstalled = 0;
