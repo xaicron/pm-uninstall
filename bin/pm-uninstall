@@ -219,7 +219,9 @@ sub is_local_lib {
     return 0 unless exists $INC{'local/lib.pm'};
 
     $local_lib_base ||= '~/perl5';
-    $local_lib_base = quotemeta Cwd::realpath(File::Spec->catfile($local_lib_base));
+    $local_lib_base = quotemeta File::Spec->catfile(Cwd::realpath($local_lib_base));
+    $file = File::Spec->catfile($file);
+
     return $file =~ /^$local_lib_base/ ? 1 : 0;
 }
 
