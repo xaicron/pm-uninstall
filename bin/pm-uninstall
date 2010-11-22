@@ -111,7 +111,7 @@ sub ask_permission {
         $vname = vname_for($module);
         warn "Checking modules depending on $vname\n" if $opt->{verbose};
         warn "-> Getting from $base_url$vname\n" if $opt->{verbose};
-        my $content = get("$base_url$vname");
+        my $content = get("$base_url$vname") || '';
         for my $dep ($content =~ m|<li>([a-zA-Z0-9_:-]+)|smg) {
             $dep =~ s/^\s+|\s+$//smg; # trim
             next if $seen{$dep}++;
