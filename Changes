@@ -1,5 +1,9 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.13    Mon Nov 22 19:25:16 2010
+        - fixed `-L` option problem (suggested by tokuhirom++)
+        - fixed wrong show dependencies issue (previous version was not corrected)
+
 0.12    Sun Nov 21 16:00:27 2010
         - fixed wrong show dependencies issue (report by tokuhirom++)
         - fixed `-L` option was not working
