@@ -8,7 +8,7 @@ use Getopt::Long qw/GetOptions :config bundling/;
 use Pod::Usage qw/pod2usage/;
 use Config;
 use ExtUtils::MakeMaker;
-use LWP::Simple;
+use HTTP::Lite;
 use YAML;
 use YAML::Loader; # workaround for -L
 use CPAN::DistnameInfo;
@@ -157,6 +157,14 @@ sub find_packlist {
 
     my $pl2 = locate_pack($info->dist);
     return ($pl2, $info->dist, $info->distvname);
+}
+
+sub get {
+    my ($uri) = @_;
+    my $http = HTTP::Lite->new;
+    my $req = $http->request($uri) or die "Unable to get $uri: $!";
+    die "Request failed ($req): " . $http->status_message if $req ne 200;
+    return $http->body;
 }
 
 sub is_core_module {
