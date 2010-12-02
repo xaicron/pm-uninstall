@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.15    Fri Dec  3 00:16:50 2010
+        - suppress warnings for no CPAN module
+
 0.14    Tue Nov 23 01:06:22 2010
         - workaround for Windows
 
