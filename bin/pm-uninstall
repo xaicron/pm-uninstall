@@ -10,17 +10,18 @@ use Config;
 use ExtUtils::MakeMaker;
 use LWP::Simple;
 use YAML;
-use YAML::Loader; # workaround for -L
 use CPAN::DistnameInfo;
 use Module::CoreList;
+use version;
 
 use App::pmuninstall;
 
-my $perl_version = version->new($^V)->numify;
-
+my $perl_version = version->new($])->numify;
 my $base_url = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 my $uninstalled = 0;
+
+my @inc = @INC;
 
 my $opt = +{
     check_deps => 1,
@@ -110,10 +111,9 @@ sub ask_permission {
         $vname ||= vname_for($module) || $module;
         warn "Checking modules depending on $vname\n" if $opt->{verbose};
         warn "-> Getting from $base_url$vname\n" if $opt->{verbose};
-        my $content = get("$base_url$vname");
+        my $content = get("$base_url$vname") || '';
         for my $dep ($content =~ m|<li>([a-zA-Z0-9_:-]+)|smg) {
-            $dep =~ s/^\s+|\s+$//smg;
-            $dep =~ s/\-[^\-]+$//; # version
+            $dep =~ s/^\s+|\s+$//smg; # trim
             next if $seen{$dep}++;
             push @deps, $dep if locate_pack($dep);
         }
@@ -169,7 +169,7 @@ sub locate_pack {
     my $dist = shift;
     $dist =~ s!-!/!g;
 
-    for my $lib (@INC) {
+    for my $lib (@inc) {
         my $packlist = "$lib/auto/$dist/.packlist";
         return $packlist if -f $packlist && -r _;
     }
@@ -181,7 +181,7 @@ sub uninstall_from_packlist {
     my ($packlist, $local_lib_base) = @_;
 
     my $inc = {
-        map { File::Spec->catfile($_) => 1 } @INC
+        map { File::Spec->catfile($_) => 1 } @inc
     };
 
     my $failed;
@@ -189,11 +189,11 @@ sub uninstall_from_packlist {
         chomp $file;
         print -f $file ? 'unlink   ' : 'not found', " : $file\n" if $opt->{verbose};
         unlink $file or warn "$file: $!\n" and $failed++;
-        rm_empty_dir_from_file($file, $inc) or $failed++;
+        rm_empty_dir_from_file($file, $inc);
     }
     print "unlink    : $packlist\n" if $opt->{verbose};
     unlink $packlist or warn "$packlist: $!\n" and $failed++;
-    rm_empty_dir_from_file($packlist, $inc) or $failed++;
+    rm_empty_dir_from_file($packlist, $inc);
 
     print "\n" if $opt->{verbose};
 
@@ -219,8 +219,10 @@ sub is_local_lib {
     return 0 unless exists $INC{'local/lib.pm'};
 
     $local_lib_base ||= '~/perl5';
-    $local_lib_base = File::Spec->catfile($local_lib_base);
-    return $file =~ $local_lib_base ? 1 : 0;
+    $local_lib_base = quotemeta File::Spec->catfile(Cwd::realpath($local_lib_base));
+    $file = File::Spec->catfile($file);
+
+    return $file =~ /^$local_lib_base/ ? 1 : 0;
 }
 
 sub is_empty_dir {
@@ -253,16 +255,10 @@ sub setup_local_lib {
     $base ||= '~/perl5/';
 
     require local::lib;
-    if ($self_contained) {
-        @INC = (
-            local::lib->install_base_perl_path($base),
-            local::lib->install_base_arch_path($base),
-            @Config{qw(privlibexp archlibexp)},
-        );
-    }
-
     local $SIG{__WARN__} = sub { }; # catch 'Attempting to write ...'
-    local::lib->import($base);
+    @inc = map { Cwd::realpath($_) } split $Config{path_sep},
+        +{local::lib->build_environment_vars_for($base, $self_contained ? 0 : 1)}->{PERL5LIB};
+    push @inc, @INC unless $self_contained;
 }
 
 
