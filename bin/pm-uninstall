@@ -107,7 +107,7 @@ sub ask_permission {
 
     my(@deps, %seen);
     if ($opt->{check_deps}) {
-        $vname = vname_for($module);
+        $vname ||= vname_for($module) || $module;
         warn "Checking modules depending on $vname\n" if $opt->{verbose};
         warn "-> Getting from $base_url$vname\n" if $opt->{verbose};
         my $content = get("$base_url$vname");
