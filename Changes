@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.16    Wed Feb 23 01:19:12 2011
+        - fixe couldn't remove core-modules installed from 'local::lib' or etc... issue (suggested by masartz)
+
 0.15    Fri Dec  3 00:16:50 2010
         - suppress warnings for no CPAN module
 
