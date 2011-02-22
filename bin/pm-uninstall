@@ -22,6 +22,7 @@ my $cpanmetadb = 'http://cpanmetadb.appspot.com/v1.0/package';
 my $uninstalled = 0;
 
 my @inc = @INC;
+my @core_modules_dir = do { my %h; grep !$h{$_}++, @Config{qw/archlib archlibexp privlib privlibexp/} };
 
 my $opt = +{
     check_deps => 1,
@@ -60,11 +61,6 @@ sub main {
     }
 
     for my $module (@modules) {
-        if (is_core_module($module)) {
-            warn "$module is Core Module!! Can't be uninstall.\n";
-            next;
-        }
-
         my($packlist, $dist, $vname) = find_packlist($module);
 
         unless ($dist) {
@@ -74,6 +70,13 @@ sub main {
 
         unless ($packlist) {
             warn "$module is not installed.\n";
+            next;
+        }
+
+        $packlist = File::Spec->catfile($packlist);
+
+        if (is_core_module($module, $packlist)) {
+            warn "$module is Core Module!! Can't be uninstall.\n";
             next;
         }
 
@@ -161,8 +164,18 @@ sub find_packlist {
 }
 
 sub is_core_module {
-    my ($dist) = @_;
-    exists $Module::CoreList::version{$perl_version}{$dist} ? 1 : 0;
+    my ($dist, $packlist) = @_;
+    return unless exists $Module::CoreList::version{$perl_version}{$dist};
+
+    my $is_core = 0;
+    for my $dir (@core_modules_dir) {
+        if ($packlist =~ /^$dir/) {
+            $is_core = 1;
+            last;
+        }
+    }
+
+    return $is_core;
 }
 
 sub locate_pack {
