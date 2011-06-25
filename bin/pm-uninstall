@@ -115,7 +115,7 @@ sub ask_permission {
         warn "Checking modules depending on $vname\n" if $opt->{verbose};
         warn "-> Getting from $base_url$vname\n" if $opt->{verbose};
         my $content = get("$base_url$vname") || '';
-        for my $dep ($content =~ m|<li>([a-zA-Z0-9_:-]+)|smg) {
+        for my $dep ($content =~ m|<li><a href=[^>]+>([a-zA-Z0-9_:-]+)|smg) {
             $dep =~ s/^\s+|\s+$//smg; # trim
             next if $seen{$dep}++;
             push @deps, $dep if locate_pack($dep);
