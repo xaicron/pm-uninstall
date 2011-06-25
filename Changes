@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.17    Sat Jun 25 15:06:12 2011
+        - fixed the dependencies check problem
+
 0.16    Wed Feb 23 01:19:12 2011
         - fixe couldn't remove core-modules installed from 'local::lib' or etc... issue (suggested by masartz)
 
