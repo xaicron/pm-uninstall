@@ -6,6 +6,7 @@ inc
 pm_to_blib
 Makefile.old
 nytprof.out
+MANIFEST
 MANIFEST.bak
 MYMETA.yml
 *.sw[po]
