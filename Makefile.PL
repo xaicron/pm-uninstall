@@ -8,7 +8,7 @@ WriteMakefile(
         'ExtUtils::Install' => 1.43,
         'CPAN::DistnameInfo' => 0,
         'YAML' => 0,
-        'LWP::Simple' => 0,
+        'HTTP::Tiny' => 0.012,
         'local::lib' => '1.006007',
         'Module::CoreList' => 0,
         'version' => 0,
