@@ -75,7 +75,7 @@ sub uninstall {
         
         if ($self->{force} or $self->ask_permission($module, $dist, $vname, $packlist)) {
             if ($self->uninstall_from_packlist($packlist)) {
-                $self->puts("$module is successfully uninstalled.");
+                $self->puts("$module is successfully uninstalled.\n");
                 ++$uninstalled;
             }
             else {
