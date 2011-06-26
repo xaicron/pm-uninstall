@@ -1,5 +1,8 @@
 Revision history for Perl extension App::moduleuninstall
 
+0.18    Sun Jun 26 13:20:05 2011
+        - modularization
+
 0.17    Sat Jun 25 15:06:12 2011
         - fixed the dependencies check problem
 
