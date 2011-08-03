@@ -9,7 +9,6 @@ WriteMakefile(
         'CPAN::DistnameInfo' => 0,
         'YAML' => 0,
         'HTTP::Tiny' => 0.012,
-        'local::lib' => '1.006007',
         'Module::CoreList' => 0,
         'version' => 0,
     },

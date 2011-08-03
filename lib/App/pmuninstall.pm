@@ -163,6 +163,7 @@ sub locate_pack {
     $dist =~ s!-!/!g;
     for my $lib (@{$self->{inc}}) {
         my $packlist = "$lib/auto/$dist/.packlist";
+        $self->puts("-> Finding .packlist $packlist") if $self->{verbose};
         return $packlist if -f $packlist && -r _;
     }
     return;
@@ -256,11 +257,32 @@ sub setup_local_lib {
     my $self = shift;
     return unless $self->{local_lib};
 
-    require local::lib;
     local $SIG{__WARN__} = sub { }; # catch 'Attempting to write ...'
-    $self->{inc} = [ map { Cwd::realpath($_) } split $Config{path_sep},
-        +{local::lib->build_environment_vars_for($self->{local_lib}, $self->{self_contained} ? 0 : 1)}->{PERL5LIB} ];
+    $self->{inc} = [
+        map { Cwd::realpath($_) }
+            @{$self->build_active_perl5lib($self->{local_lib}, $self->{self_contained})}
+    ];
     push @{$self->{inc}}, @INC unless $self->{self_contained};
+}
+
+sub build_active_perl5lib {
+    my ($self, $path, $interpolate) = @_;
+    my $perl5libs = [
+        $self->install_base_arch_path($path),
+        $self->install_base_perl_path($path),
+        $interpolate && $ENV{PERL5LIB} ? $ENV{PERL5LIB} : (),
+    ];
+    return $perl5libs;
+}
+
+sub install_base_perl_path {
+    my ($self, $path) = @_;
+    File::Spec->catdir($path, 'lib', 'perl5');
+}
+
+sub install_base_arch_path {
+    my ($self, $path) = @_;
+    File::Spec->catdir($self->install_base_perl_path($path), $Config{archname});
 }
 
 sub fetch {
