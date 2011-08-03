@@ -8,5 +8,5 @@ Makefile.old
 nytprof.out
 MANIFEST
 MANIFEST.bak
-MYMETA.yml
+MYMETA.*
 *.sw[po]

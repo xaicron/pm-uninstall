@@ -1,5 +1,9 @@
 Revision history for Perl extension App::pmuninstall
 
+0.19    Thu Aug  4 02:52:38 2011
+        - removed dependency on local::lib
+            (did not work, because latest local::lib had been changed interface.)
+
 0.18    Sun Jun 26 13:20:05 2011
         - modularization
 
