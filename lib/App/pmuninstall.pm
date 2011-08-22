@@ -34,7 +34,7 @@ sub run {
     local @ARGV = @args;
     GetOptions(
         'f|force'                 => \$self->{force},
-        'v|verbose!'              => \$self->{verbose},
+        'v|verbose!'              => sub { ++$self->{verbose} },
         'c|checkdeps!'            => \$self->{check_deps},
         'n|no-checkdeps!'         => sub { $self->{check_deps} = 0 },
         'h|help!'                 => \$self->{help},
@@ -163,7 +163,7 @@ sub locate_pack {
     $dist =~ s!-!/!g;
     for my $lib (@{$self->{inc}}) {
         my $packlist = "$lib/auto/$dist/.packlist";
-        $self->puts("-> Finding .packlist $packlist") if $self->{verbose};
+        $self->puts("-> Finding .packlist $packlist") if $self->{verbose} > 1;
         return $packlist if -f $packlist && -r _;
     }
     return;
