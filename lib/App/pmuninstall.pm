@@ -175,7 +175,8 @@ sub is_core_module {
 
     my $is_core = 0;
     for my $dir (@core_modules_dir) {
-        if ($packlist =~ /^$dir/) {
+        my $safe_dir = quotemeta $dir; # workaround for MSWin32
+        if ($packlist =~ /^$safe_dir/) {
             $is_core = 1;
             last;
         }
