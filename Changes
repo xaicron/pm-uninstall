@@ -1,5 +1,8 @@
 Revision history for Perl extension App::pmuninstall
 
+0.20    Wed Aug 24 02:19:56 2011
+        - is_core_module was broken (win32)
+
 0.19    Thu Aug  4 02:52:38 2011
         - removed dependency on local::lib
             (did not work, because latest local::lib had been changed interface.)
