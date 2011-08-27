@@ -21,11 +21,12 @@ my $cpanmetadb     = 'http://cpanmetadb.appspot.com/v1.0/package';
 my @core_modules_dir = do { my %h; grep !$h{$_}++, @Config{qw/archlib archlibexp privlib privlibexp/} };
 
 sub new {
-    my $class = shift;
+    my ($class, $inc) = @_;
+    $inc = [@INC] unless ref $inc eq 'ARRAY';
     bless {
         check_deps => 1,
         verbose    => 0,
-        inc        => [@INC],
+        inc        => $class->prepare_include_paths($inc),
     }, $class;
 }
 
@@ -317,6 +318,18 @@ Usage:
 USAGE
 
     exit 1;
+}
+
+sub prepare_include_paths {
+    my ($class, $inc) = @_;
+    my $new_inc = [];
+    my $archname = quotemeta $Config{archname};
+    for my $path (@$inc) {
+        push @$new_inc, $path;
+        next if $path eq '.' or $path =~ /$archname/;
+        push @$new_inc, File::Spec->catdir($path, $Config{archname});
+    }
+    return [do { my %h; grep !$h{$_}++, @$new_inc }];
 }
 
 1;
