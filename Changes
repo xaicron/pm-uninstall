@@ -1,5 +1,9 @@
 Revision history for Perl extension App::pmuninstall
 
+0.21    Sun Aug 28 03:01:03 2011
+        - maybe fixed: cannot be find a XS path problem. (reported by Ben Bullock++)
+        - added --quiet option
+
 0.20    Wed Aug 24 02:19:56 2011
         - is_core_module was broken (win32)
 

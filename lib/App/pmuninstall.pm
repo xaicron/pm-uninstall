@@ -13,7 +13,7 @@ use Module::CoreList;
 use version;
 use HTTP::Tiny;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 my $perl_version = version->new($])->numify;
 my $depended_on_by = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
