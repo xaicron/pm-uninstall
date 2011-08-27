@@ -21,6 +21,7 @@ __END__
       -f,--force                    Uninstalls without prompts
       -c,--checkdeps                Check dependencies ( default on )
       -n,--no-checkdeps             Not check dependencies
+      -q,--quiet                    Suppress some messages
       -h,--help                     This help message
       -V,--version                  Show version
       -l,--local-lib                Additional module path

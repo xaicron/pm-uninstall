@@ -38,6 +38,7 @@ sub run {
         'v|verbose!'              => sub { ++$self->{verbose} },
         'c|checkdeps!'            => \$self->{check_deps},
         'n|no-checkdeps!'         => sub { $self->{check_deps} = 0 },
+        'q|quiet!'                => \$self->{quiet},
         'h|help!'                 => \$self->{help},
         'V|version!'              => \$self->{version},
         'l|local-lib=s'           => \$self->{local_lib},
@@ -201,12 +202,13 @@ sub ask_permission {
         }
     }
 
-    $self->puts("$module is included in the distribution $dist and contains:\n");
+    $self->puts("$module is included in the distribution $dist and contains:\n")
+        unless $self->{quiet};
     for my $file ($self->fixup_packilist($packlist)) {
         chomp $file;
-        $self->puts("  $file");
+        $self->puts("  $file") unless $self->{quiet};
     }
-    $self->puts;
+    $self->puts unless $self->{quiet};
 
     my $default = 'y';
     if (@deps) {
@@ -311,6 +313,7 @@ Usage:
           -f,--force                    Uninstalls without prompts
           -c,--checkdeps                Check dependencies ( default on )
           -n,--no-checkdeps             Not check dependencies
+          -q,--quiet                    Suppress some messages
           -h,--help                     This help message
           -V,--version                  Show version
           -l,--local-lib                Additional module path
@@ -379,6 +382,10 @@ Check dependencies ( default on )
 Not check dependencies
 
   $ pm-uninstall -n LWP
+
+=item -q, --quiet
+
+Suppress some messages
 
 =item -h, --help
 
