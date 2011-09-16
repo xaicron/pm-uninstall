@@ -12,6 +12,7 @@ use CPAN::DistnameInfo;
 use Module::CoreList;
 use version;
 use HTTP::Tiny;
+use Term::ANSIColor qw(colored);
 
 our $VERSION = "0.21";
 
@@ -19,6 +20,8 @@ my $perl_version     = version->new($])->numify;
 my $depended_on_by   = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
 my $cpanmetadb       = 'http://cpanmetadb.appspot.com/v1.0/package';
 my @core_modules_dir = do { my %h; grep !$h{$_}++, @Config{qw/archlib archlibexp privlib privlibexp/} };
+
+$ENV{ANSI_COLORS_DISABLED} = 1 if $^O eq 'MSWin32';
 
 sub new {
     my ($class, $inc) = @_;
@@ -68,30 +71,30 @@ sub uninstall {
         $self->puts("--> Working on $module") unless $self->{quiet};
         my ($packlist, $dist, $vname) = $self->find_packlist($module);
         unless ($dist) {
-            $self->puts("! $module is not found.");
+            $self->puts(colored ['red'], "! $module is not found.");
             $self->puts unless $self->{quiet};
             next;
         }
         unless ($packlist) {
-            $self->puts("! $module is not installed.");
+            $self->puts(colored ['red'], "! $module is not installed.");
             $self->puts unless $self->{quiet};
             next;
         }
 
         $packlist = File::Spec->catfile($packlist);
         if ($self->is_core_module($module, $packlist)) {
-            $self->puts("! $module is Core Module!! Can't be uninstall.");
+            $self->puts(colored ['red'], "! $module is Core Module!! Can't be uninstall.");
             $self->puts unless $self->{quiet};
             next;
         }
         
         if ($self->ask_permission($module, $dist, $vname, $packlist)) {
             if ($self->uninstall_from_packlist($packlist)) {
-                $self->puts("Successfully uninstalled $module");
+                $self->puts(colored ['green'], "Successfully uninstalled $module");
                 ++$uninstalled;
             }
             else {
-                $self->puts("! Failed uninstall $module");
+                $self->puts(colored ['red'], "! Failed uninstall $module");
             }
             $self->puts unless $self->{quiet};
         }
