@@ -39,7 +39,7 @@ sub run {
         'c|checkdeps!'            => \$self->{check_deps},
         'n|no-checkdeps!'         => sub { $self->{check_deps} = 0 },
         'q|quiet!'                => \$self->{quiet},
-        'h|help!'                 => \$self->{help},
+        'h|help!'                 => sub { $self->usage },
         'V|version!'              => \$self->{version},
         'l|local-lib=s'           => \$self->{local_lib},
         'L|local-lib-contained=s' => sub {
@@ -47,12 +47,13 @@ sub run {
             $self->{self_contained} = 1;
         },
     ) or $self->usage;
-    $self->usage if $self->{help} || !scalar @ARGV;
 
     if ($self->{version}) {
         $self->puts("pm-uninstall (App::pmuninstall) version $App::pmuninstall::VERSION");
         exit;
     }
+
+    $self->short_usage unless @ARGV;
 
     $self->uninstall(@ARGV);
 }
@@ -311,7 +312,7 @@ sub usage {
     my $self = shift;
     $self->puts(<< 'USAGE');
 Usage:
-      pm-uninstall [options] Module ...
+      pm-uninstall [options] Module [...]
 
       options:
           -v,--verbose                  Turns on chatty output
@@ -323,6 +324,17 @@ Usage:
           -V,--version                  Show version
           -l,--local-lib                Additional module path
           -L,--local-lib-contained      Additional module path (don't include non-core modules)
+USAGE
+
+    exit 1;
+}
+
+sub short_usage {
+    my $self = shift;
+    $self->puts(<< 'USAGE');
+Usage: pm-uninstall [options] Module [...]
+
+Try `pm-uninstall --help` or `man pm-uninstall` for more options.
 USAGE
 
     exit 1;
