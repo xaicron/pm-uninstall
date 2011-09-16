@@ -65,34 +65,40 @@ sub uninstall {
 
     my $uninstalled = 0;
     for my $module (@modules) {
+        $self->puts("--> Working on $module") unless $self->{quiet};
         my ($packlist, $dist, $vname) = $self->find_packlist($module);
         unless ($dist) {
-            $self->puts("$module is not found.");
+            $self->puts("! $module is not found.");
+            $self->puts unless $self->{quiet};
             next;
         }
         unless ($packlist) {
-            $self->puts("$module is not installed.");
+            $self->puts("! $module is not installed.");
+            $self->puts unless $self->{quiet};
             next;
         }
 
         $packlist = File::Spec->catfile($packlist);
         if ($self->is_core_module($module, $packlist)) {
-            $self->puts("$module is Core Module!! Can't be uninstall.");
+            $self->puts("! $module is Core Module!! Can't be uninstall.");
+            $self->puts unless $self->{quiet};
             next;
         }
         
-        if ($self->{force} or $self->ask_permission($module, $dist, $vname, $packlist)) {
+        if ($self->ask_permission($module, $dist, $vname, $packlist)) {
             if ($self->uninstall_from_packlist($packlist)) {
-                $self->puts("$module is successfully uninstalled.\n");
+                $self->puts("Successfully uninstalled $module");
                 ++$uninstalled;
             }
             else {
-                $self->puts("! $module is failed uninstall.");
+                $self->puts("! Failed uninstall $module");
             }
+            $self->puts unless $self->{quiet};
         }
     }
 
     if ($uninstalled) {
+        $self->puts if $self->{quiet};
         $self->puts("You may want to rebuild man(1) entires. Try `mandb -c` if needed");
     }
 
@@ -117,8 +123,7 @@ sub uninstall_from_packlist {
     unlink $packlist or $self->puts("$packlist: $!") and $failed++;
     $self->rm_empty_dir_from_file($packlist, $inc);
 
-    $self->puts if $self->{verbose};
-
+    $self->puts unless $self->{quiet} || $self->{force};
     return !$failed;
 }
 
@@ -152,8 +157,10 @@ sub find_packlist {
 
     # find with the given name first
     (my $try_dist = $module) =~ s!::!-!g;
-    my $pl = $self->locate_pack($try_dist);
-    return ($pl, $try_dist) if $pl;
+    if (my $pl = $self->locate_pack($try_dist)) {
+        $self->puts("-> Found $pl") if $self->{verbose};
+        return ($pl, $try_dist);
+    }
 
     $self->puts("Looking up $module on cpanmetadb") if $self->{verbose};
 
@@ -162,8 +169,10 @@ sub find_packlist {
     my $meta = YAML::Load($yaml);
     my $info = CPAN::DistnameInfo->new($meta->{distfile});
 
-    my $pl2 = $self->locate_pack($info->dist);
-    return ($pl2, $info->dist, $info->distvname);
+    if (my $pl = $self->locate_pack($info->dist)) {
+        $self->puts("-> Found $pl") if $self->{verbose};
+        return ($pl, $info->dist, $info->distvname);
+    }
 }
 
 sub locate_pack {
@@ -196,18 +205,19 @@ sub ask_permission {
     my($self, $module, $dist, $vname, $packlist) = @_;
 
     my(@deps, %seen);
-    if ($self->{check_deps}) {
+    if ($self->{check_deps} && !$self->{force}) {
         $vname ||= $self->vname_for($module) || $module;
         $self->puts("Checking modules depending on $vname") if $self->{verbose};
-        $self->puts("-> Getting from $depended_on_by$vname") if $self->{verbose};
         my $content = $self->fetch("$depended_on_by$vname") || '';
         for my $dep ($content =~ m|<li><a href=[^>]+>([a-zA-Z0-9_:-]+)|smg) {
             $dep =~ s/^\s+|\s+$//smg; # trim
             next if $seen{$dep}++;
+            $self->puts("Finding $dep in your \@INC (dependent module)") if $self->{verbose};
             push @deps, $dep if $self->locate_pack($dep);
         }
     }
 
+    $self->puts if $self->{verbose};
     $self->puts("$module is included in the distribution $dist and contains:\n")
         unless $self->{quiet};
     for my $file ($self->fixup_packilist($packlist)) {
@@ -215,6 +225,8 @@ sub ask_permission {
         $self->puts("  $file") unless $self->{quiet};
     }
     $self->puts unless $self->{quiet};
+
+    return 'force uninstall' if $self->{force};
 
     my $default = 'y';
     if (@deps) {
@@ -255,6 +267,7 @@ sub is_local_lib {
 sub vname_for {
     my ($self, $module) = @_;
 
+    $self->puts("Fetching $module vname on cpanmetadb") if $self->{verbose};
     my $yaml = $self->fetch("$cpanmetadb/$module") or return;
     my $meta = YAML::Load($yaml);
     my $info = CPAN::DistnameInfo->new($meta->{distfile}) or return;
@@ -297,6 +310,7 @@ sub install_base_arch_path {
 
 sub fetch {
     my ($self, $url) = @_;
+    $self->puts("-> Getting from $url") if $self->{verbose};
     my $res = HTTP::Tiny->new->get($url);
     die "[$res->{status}] fetch $url failed!!\n" if !$res->{success} && $res->{status} != 404;
     return $res->{content};
