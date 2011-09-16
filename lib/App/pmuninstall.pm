@@ -15,9 +15,9 @@ use HTTP::Tiny;
 
 our $VERSION = "0.21";
 
-my $perl_version = version->new($])->numify;
-my $depended_on_by = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
-my $cpanmetadb     = 'http://cpanmetadb.appspot.com/v1.0/package';
+my $perl_version     = version->new($])->numify;
+my $depended_on_by   = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
+my $cpanmetadb       = 'http://cpanmetadb.appspot.com/v1.0/package';
 my @core_modules_dir = do { my %h; grep !$h{$_}++, @Config{qw/archlib archlibexp privlib privlibexp/} };
 
 sub new {
