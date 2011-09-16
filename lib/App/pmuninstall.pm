@@ -49,6 +49,11 @@ sub run {
     ) or $self->usage;
     $self->usage if $self->{help} || !scalar @ARGV;
 
+    if ($self->{version}) {
+        $self->puts("pm-uninstall (App::pmuninstall) version $App::pmuninstall::VERSION");
+        exit;
+    }
+
     $self->uninstall(@ARGV);
 }
 
