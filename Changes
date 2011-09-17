@@ -1,5 +1,11 @@
 Revision history for Perl extension App::pmuninstall
 
+0.22    Sat Sep 17 17:10:26 2011
+        - shorten startup time
+        - fix checking core module logic
+        - fix was gone version option
+        - coloring for Success or Failed message.
+
 0.21    Sun Aug 28 03:01:03 2011
         - maybe fixed: cannot be find a XS path problem. (reported by Ben Bullock++)
         - added --quiet option
