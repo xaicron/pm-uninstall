@@ -389,7 +389,7 @@ App::pmuninstall - Uninstall modules
 App::pmuninstall is Fast module uninstaller.
 delete files from B<.packlist>.
 
-C<App:: cpanminus> and, C<App:: cpanoutdated> with a high affinity.
+L<App::cpanminus> and, L<App::cpanoutdated> with a high affinity.
 
 =head1 SYNOPSIS
 
