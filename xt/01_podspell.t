@@ -6,5 +6,14 @@ $ENV{LANG} = 'C';
 all_pod_files_spelling_ok('lib');
 __DATA__
 Yuji Shimada
+Tatsuhiko Miyagawa
+
 xaicron@cpan.org
 App::pmuninstall
+
+Uninstall
+uninstalls
+checkdeps
+packlist
+uninstall
+uninstaller
