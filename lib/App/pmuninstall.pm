@@ -9,7 +9,6 @@ use Config;
 use ExtUtils::MakeMaker;
 use YAML;
 use CPAN::DistnameInfo;
-use Module::CoreList;
 use version;
 use HTTP::Tiny;
 use Term::ANSIColor qw(colored);
@@ -70,16 +69,6 @@ sub uninstall {
     for my $module (@modules) {
         $self->puts("--> Working on $module") unless $self->{quiet};
         my ($packlist, $dist, $vname) = $self->find_packlist($module);
-        unless ($dist) {
-            $self->puts(colored ['red'], "! $module is not found.");
-            $self->puts unless $self->{quiet};
-            next;
-        }
-        unless ($packlist) {
-            $self->puts(colored ['red'], "! $module is not installed.");
-            $self->puts unless $self->{quiet};
-            next;
-        }
 
         $packlist = File::Spec->catfile($packlist);
         if ($self->is_core_module($module, $packlist)) {
@@ -87,7 +76,19 @@ sub uninstall {
             $self->puts unless $self->{quiet};
             next;
         }
-        
+
+        unless ($dist) {
+            $self->puts(colored ['red'], "! $module is not found.");
+            $self->puts unless $self->{quiet};
+            next;
+        }
+
+        unless ($packlist) {
+            $self->puts(colored ['red'], "! $module is not installed.");
+            $self->puts unless $self->{quiet};
+            next;
+        }
+
         if ($self->ask_permission($module, $dist, $vname, $packlist)) {
             if ($self->uninstall_from_packlist($packlist)) {
                 $self->puts(colored ['green'], "Successfully uninstalled $module");
@@ -191,7 +192,9 @@ sub locate_pack {
 
 sub is_core_module {
     my ($self, $dist, $packlist) = @_;
+    require Module::CoreList;
     return unless exists $Module::CoreList::version{$perl_version}{$dist};
+    return 1 unless $packlist;
 
     my $is_core = 0;
     for my $dir (@core_modules_dir) {
