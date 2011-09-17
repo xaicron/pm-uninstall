@@ -5,7 +5,6 @@ use File::Spec;
 use File::Basename qw(dirname);
 use Getopt::Long qw(GetOptions :config bundling);
 use Config;
-use ExtUtils::MakeMaker;
 use YAML ();
 use CPAN::DistnameInfo;
 use version;
@@ -242,7 +241,14 @@ sub ask_permission {
         $self->puts;
         $default = 'n';
     }
-    return lc(prompt("Are you sure to uninstall $dist?", $default)) eq 'y';
+
+    return lc($self->prompt("Are you sure to uninstall $dist?", $default)) eq 'y';
+}
+
+sub prompt {
+    my ($self, $msg, $default) = @_;
+    require ExtUtils::MakeMaker;
+    ExtUtils::MakeMaker::prompt($msg, $default);
 }
 
 sub fixup_packilist {
