@@ -267,7 +267,7 @@ sub fixup_packlist {
 
 sub is_local_lib {
     my ($self, $file) = @_;
-    return unless exists $INC{'local/lib.pm'};
+    return unless $self->{local_lib};
 
     my $local_lib_base = quotemeta File::Spec->catfile(Cwd::realpath($self->{local_lib}));
     $file = File::Spec->catfile($file);
@@ -291,6 +291,12 @@ sub setup_local_lib {
     my $self = shift;
     return unless $self->{local_lib};
 
+    unless (-d $self->{local_lib}) {
+        $self->puts(colored ['red'], "! $self->{local_lib} is no such directory");
+        exit 1;
+    }
+
+    require Cwd;
     local $SIG{__WARN__} = sub { }; # catch 'Attempting to write ...'
     $self->{inc} = [
         map { Cwd::realpath($_) }
