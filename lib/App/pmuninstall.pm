@@ -20,6 +20,8 @@ my @core_modules_dir = do { my %h; grep !$h{$_}++, @Config{qw/archlib archlibexp
 
 $ENV{ANSI_COLORS_DISABLED} = 1 if $^O eq 'MSWin32';
 
+our $OUTPUT_INDENT_LEVEL = 0;
+
 sub new {
     my ($class, $inc) = @_;
     $inc = [@INC] unless ref $inc eq 'ARRAY';
@@ -216,7 +218,8 @@ sub ask_permission {
         for my $dep ($content =~ m|<li><a href=[^>]+>([a-zA-Z0-9_:-]+)|smg) {
             $dep =~ s/^\s+|\s+$//smg; # trim
             next if $seen{$dep}++;
-            $self->puts("Finding $dep in your \@INC (dependent module)") if $self->{verbose};
+            local $OUTPUT_INDENT_LEVEL = $OUTPUT_INDENT_LEVEL + 1;
+            $self->puts("Finding $dep in your \@INC (dependencies)") if $self->{verbose};
             push @deps, $dep if $self->locate_pack($dep);
         }
     }
@@ -336,6 +339,7 @@ sub fetch {
 sub puts {
     my ($self, @msg) = @_;
     push @msg, '' unless @msg;
+    print '  ' x $OUTPUT_INDENT_LEVEL if $OUTPUT_INDENT_LEVEL;
     print @msg, "\n";
 }
 
