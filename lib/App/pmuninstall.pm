@@ -115,7 +115,7 @@ sub uninstall_from_packlist {
     };
 
     my $failed;
-    for my $file ($self->fixup_packilist($packlist)) {
+    for my $file ($self->fixup_packlist($packlist)) {
         chomp $file;
         $self->puts(-f $file ? 'unlink   ' : 'not found', " : $file") if $self->{verbose};
         unlink $file or $self->puts("$file: $!") and $failed++;
@@ -224,7 +224,7 @@ sub ask_permission {
     $self->puts if $self->{verbose};
     $self->puts("$module is included in the distribution $dist and contains:\n")
         unless $self->{quiet};
-    for my $file ($self->fixup_packilist($packlist)) {
+    for my $file ($self->fixup_packlist($packlist)) {
         chomp $file;
         $self->puts("  $file") unless $self->{quiet};
     }
@@ -251,7 +251,7 @@ sub prompt {
     ExtUtils::MakeMaker::prompt($msg, $default);
 }
 
-sub fixup_packilist {
+sub fixup_packlist {
     my ($self, $packlist) = @_;
     my @target_list;
     my $is_local_lib = $self->is_local_lib($packlist);
