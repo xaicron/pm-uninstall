@@ -1,5 +1,9 @@
 Revision history for Perl extension App::pmuninstall
 
+0.23    Tue Oct  4 01:57:32 2011
+        - fix broken -l and -L option (rt:71417)
+        - fix doc
+
 0.22    Sat Sep 17 17:10:26 2011
         - shorten startup time
         - fix checking core module logic

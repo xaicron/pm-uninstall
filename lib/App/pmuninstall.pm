@@ -11,7 +11,7 @@ use version;
 use HTTP::Tiny;
 use Term::ANSIColor qw(colored);
 
-our $VERSION = "0.22";
+our $VERSION = "0.23";
 
 my $perl_version     = version->new($])->numify;
 my $depended_on_by   = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
