@@ -10,6 +10,7 @@ use CPAN::DistnameInfo;
 use version;
 use HTTP::Tiny;
 use Term::ANSIColor qw(colored);
+use Cwd ();
 
 our $VERSION = "0.23";
 
@@ -299,7 +300,6 @@ sub setup_local_lib {
         exit 1;
     }
 
-    require Cwd;
     local $SIG{__WARN__} = sub { }; # catch 'Attempting to write ...'
     $self->{inc} = [
         map { Cwd::realpath($_) }
