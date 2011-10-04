@@ -1,5 +1,8 @@
 Revision history for Perl extension App::pmuninstall
 
+0.24    Tue Oct  4 15:10:39 2011
+        - fix is_local_lib() (But, it's called after the setup_local_lib(), no problem)
+
 0.23    Tue Oct  4 01:57:32 2011
         - fix broken -l and -L option (rt:71417)
         - fix doc
