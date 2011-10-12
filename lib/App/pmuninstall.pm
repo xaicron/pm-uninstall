@@ -12,7 +12,6 @@ use HTTP::Tiny;
 use Term::ANSIColor qw(colored);
 use Cwd ();
 use JSON::PP qw(decode_json);
-use File::Slurp qw(slurp);
 
 our $VERSION = "0.24";
 
@@ -191,7 +190,7 @@ sub find_meta {
         next unless $lib =~ /$Config{archname}/;
         my $install_json = "$lib/.meta/$distvname/install.json";
         next unless -f $install_json && -r _;
-        my $data = decode_json slurp $install_json;
+        my $data = decode_json +$self->slurp($install_json);
         $name = $data->{name};
         $self->puts("-> Found .meta/$distvname/install.josn");
         last;
@@ -353,6 +352,12 @@ sub fetch {
     my $res = HTTP::Tiny->new->get($url);
     die "[$res->{status}] fetch $url failed!!\n" if !$res->{success} && $res->{status} != 404;
     return $res->{content};
+}
+
+sub slurp {
+    my ($self, $file) = @_;
+    open my $fh, '<', $file or die "$file $!";
+    do { local $/; <$fh> };
 }
 
 sub puts {

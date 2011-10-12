@@ -12,7 +12,6 @@ WriteMakefile(
         'Module::CoreList' => 0,
         'version' => 0,
         'JSON::PP' => 0,
-        'File::Slurp' => 0,
     },
     LICENSE => 'perl',
     EXE_FILES => [ 'bin/pm-uninstall' ],
