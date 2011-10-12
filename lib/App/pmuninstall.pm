@@ -129,6 +129,12 @@ sub uninstall_from_packlist {
     unlink $packlist or $self->puts("$packlist: $!") and $failed++;
     $self->rm_empty_dir_from_file($packlist, $inc);
 
+    if (my $install_json = $self->{install_json}) {
+        $self->puts("unlink    : $install_json") if $self->{verbose};
+        unlink $install_json or $self->puts("$install_json: $!") and $failed++;
+        $self->rm_empty_dir_from_file($install_json);
+    }
+
     $self->puts unless $self->{quiet} || $self->{force};
     return !$failed;
 }
@@ -191,8 +197,9 @@ sub find_meta {
         my $install_json = "$lib/.meta/$distvname/install.json";
         next unless -f $install_json && -r _;
         my $data = decode_json +$self->slurp($install_json);
-        $name = $data->{name};
-        $self->puts("-> Found .meta/$distvname/install.josn");
+        $name = $data->{name} || next;
+        $self->puts("-> Found $install_json");
+        $self->{meta} = $install_json;
         last;
     }
     return $name;
