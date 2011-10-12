@@ -198,7 +198,7 @@ sub find_meta {
         next unless -f $install_json && -r _;
         my $data = decode_json +$self->slurp($install_json);
         $name = $data->{name} || next;
-        $self->puts("-> Found $install_json");
+        $self->puts("-> Found $install_json") if $self->{verbose};
         $self->{meta} = $install_json;
         last;
     }
