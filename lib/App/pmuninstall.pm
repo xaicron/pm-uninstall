@@ -11,7 +11,7 @@ use version;
 use HTTP::Tiny;
 use Term::ANSIColor qw(colored);
 use Cwd ();
-use JSON qw(decode_json);
+use JSON::PP qw(decode_json);
 use File::Slurp qw(slurp);
 
 our $VERSION = "0.24";

@@ -11,7 +11,7 @@ WriteMakefile(
         'HTTP::Tiny' => 0.012,
         'Module::CoreList' => 0,
         'version' => 0,
-        'JSON' => 0,
+        'JSON::PP' => 0,
         'File::Slurp' => 0,
     },
     LICENSE => 'perl',
