@@ -11,6 +11,8 @@ use version;
 use HTTP::Tiny;
 use Term::ANSIColor qw(colored);
 use Cwd ();
+use JSON qw(decode_json);
+use File::Slurp qw(slurp);
 
 our $VERSION = "0.24";
 
@@ -174,10 +176,27 @@ sub find_packlist {
     my $meta = YAML::Load($yaml);
     my $info = CPAN::DistnameInfo->new($meta->{distfile});
 
-    if (my $pl = $self->locate_pack($info->dist)) {
+    my $name = $self->find_meta($info->distvname) || $info->dist;
+    if (my $pl = $self->locate_pack($name)) {
         $self->puts("-> Found $pl") if $self->{verbose};
         return ($pl, $info->dist, $info->distvname);
     }
+}
+
+sub find_meta {
+    my ($self, $distvname) = @_;
+
+    my $name;
+    for my $lib (@{$self->{inc}}) {
+        next unless $lib =~ /$Config{archname}/;
+        my $install_json = "$lib/.meta/$distvname/install.json";
+        next unless -f $install_json && -r _;
+        my $data = decode_json slurp $install_json;
+        $name = $data->{name};
+        $self->puts("-> Found .meta/$distvname/install.josn");
+        last;
+    }
+    return $name;
 }
 
 sub locate_pack {
