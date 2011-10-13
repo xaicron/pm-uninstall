@@ -1,5 +1,8 @@
 Revision history for Perl extension App::pmuninstall
 
+0.25    Thu Oct 13 16:03:48 2011
+        - maybe support install.json (from cpanm 1.5000 / miyagawa++)
+
 0.24    Tue Oct  4 15:10:39 2011
         - fix is_local_lib() (But, it's called after the setup_local_lib(), no problem)
 
