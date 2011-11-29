@@ -236,19 +236,7 @@ sub is_core_module {
 sub ask_permission {
     my($self, $module, $dist, $vname, $packlist) = @_;
 
-    my(@deps, %seen);
-    if ($self->{check_deps} && !$self->{force}) {
-        $vname ||= $self->vname_for($module) || $module;
-        $self->puts("Checking modules depending on $vname") if $self->{verbose};
-        my $content = $self->fetch("$depended_on_by$vname") || '';
-        for my $dep ($content =~ m|<li><a href=[^>]+>([a-zA-Z0-9_:-]+)|smg) {
-            $dep =~ s/^\s+|\s+$//smg; # trim
-            next if $seen{$dep}++;
-            local $OUTPUT_INDENT_LEVEL = $OUTPUT_INDENT_LEVEL + 1;
-            $self->puts("Finding $dep in your \@INC (dependencies)") if $self->{verbose};
-            push @deps, $dep if $self->locate_pack($dep);
-        }
-    }
+    my @deps = $self->find_deps($vname, $module);
 
     $self->puts if $self->{verbose};
     $self->puts("$module is included in the distribution $dist and contains:\n")
@@ -272,6 +260,27 @@ sub ask_permission {
     }
 
     return lc($self->prompt("Are you sure to uninstall $dist?", $default)) eq 'y';
+}
+
+sub find_deps {
+    my ($self, $vname, $module) = @_;
+
+    return unless $self->{check_deps} && !$self->{force};
+    $vname ||= $self->vname_for($module) or return;
+
+    $self->puts("Checking modules depending on $vname") if $self->{verbose};
+    my $content = $self->fetch("$depended_on_by$vname") or return;
+
+    my (@deps, %seen);
+    for my $dep ($content =~ m|<li><a href=[^>]+>([a-zA-Z0-9_:-]+)|smg) {
+        $dep =~ s/^\s+|\s+$//smg; # trim
+        next if $seen{$dep}++;
+        local $OUTPUT_INDENT_LEVEL = $OUTPUT_INDENT_LEVEL + 1;
+        $self->puts("Finding $dep in your \@INC (dependencies)") if $self->{verbose};
+        push @deps, $dep if $self->locate_pack($dep);
+    }
+
+    return @deps;
 }
 
 sub prompt {
