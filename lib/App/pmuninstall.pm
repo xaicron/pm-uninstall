@@ -357,7 +357,8 @@ sub fetch {
     my ($self, $url) = @_;
     $self->puts("-> Getting from $url") if $self->{verbose};
     my $res = HTTP::Tiny->new->get($url);
-    die "[$res->{status}] fetch $url failed!!\n" if !$res->{success} && $res->{status} != 404;
+    return if $res->{status} == 404;
+    die "[$res->{status}] fetch $url failed!!\n" if !$res->{success};
     return $res->{content};
 }
 
