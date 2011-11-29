@@ -1,5 +1,9 @@
 Revision history for Perl extension App::pmuninstall
 
+0.26    Wed Nov 30 02:45:19 2011
+        - fixed not CPAN module problem (reported by gfx++)
+        - if did not fetch vname then skip check desp.
+
 0.25    Thu Oct 13 16:03:48 2011
         - maybe support install.json (from cpanm 1.5000 / miyagawa++)
 
