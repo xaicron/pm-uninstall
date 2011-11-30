@@ -1,5 +1,8 @@
 Revision history for Perl extension App::pmuninstall
 
+0.27    Wed Nov 30 12:55:13 2011
+        - changed cpanmetadb URL
+
 0.26    Wed Nov 30 02:45:19 2011
         - fixed not CPAN module problem (reported by gfx++)
         - if did not fetch vname then skip check desp.
