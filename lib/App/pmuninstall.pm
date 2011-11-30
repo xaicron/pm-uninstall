@@ -17,7 +17,7 @@ our $VERSION = "0.26";
 
 my $perl_version     = version->new($])->numify;
 my $depended_on_by   = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
-my $cpanmetadb       = 'http://cpanmetadb.appspot.com/v1.0/package';
+my $cpanmetadb       = 'http://cpanmetadb.plackperl.org/v1.0/package';
 my @core_modules_dir = do { my %h; grep !$h{$_}++, @Config{qw/archlib archlibexp privlib privlibexp/} };
 
 $ENV{ANSI_COLORS_DISABLED} = 1 if $^O eq 'MSWin32';
