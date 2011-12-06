@@ -1,5 +1,8 @@
 Revision history for Perl extension App::pmuninstall
 
+0.28    Wed Dec  7 01:11:32 2011
+        - fixed issue: https://github.com/xaicron/pm-uninstall/issues/2 (finn++)
+
 0.27    Wed Nov 30 12:55:13 2011
         - changed cpanmetadb URL
 
