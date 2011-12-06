@@ -11,7 +11,7 @@ WriteMakefile(
         'HTTP::Tiny' => 0.012,
         'Module::CoreList' => 0,
         'version' => 0,
-        'JSON::PP' => 0,
+        'JSON::PP' => 2.01,
     },
     LICENSE => 'perl',
     EXE_FILES => [ 'bin/pm-uninstall' ],
