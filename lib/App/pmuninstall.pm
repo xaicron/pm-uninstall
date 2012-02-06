@@ -74,13 +74,13 @@ sub uninstall {
 
         $packlist = File::Spec->catfile($packlist);
         if ($self->is_core_module($module, $packlist)) {
-            $self->puts(colored ['red'], "! $module is Core Module!! Can't be uninstall.");
+            $self->puts(colored ['red'], "! $module is a core module!! Can't be uninstalled.");
             $self->puts unless $self->{quiet};
             next;
         }
 
         unless ($dist) {
-            $self->puts(colored ['red'], "! $module is not found.");
+            $self->puts(colored ['red'], "! $module not found.");
             $self->puts unless $self->{quiet};
             next;
         }
@@ -97,7 +97,7 @@ sub uninstall {
                 ++$uninstalled;
             }
             else {
-                $self->puts(colored ['red'], "! Failed uninstall $module");
+                $self->puts(colored ['red'], "! Failed to uninstall $module");
             }
             $self->puts unless $self->{quiet};
         }
@@ -105,7 +105,7 @@ sub uninstall {
 
     if ($uninstalled) {
         $self->puts if $self->{quiet};
-        $self->puts("You may want to rebuild man(1) entires. Try `mandb -c` if needed");
+        $self->puts("You may want to rebuild man(1) entries. Try `mandb -c` if needed");
     }
 
     return $uninstalled;
@@ -251,7 +251,7 @@ sub ask_permission {
 
     my $default = 'y';
     if (@deps) {
-        $self->puts("Also, they're depended on by the following dists you have:\n");
+        $self->puts("Also, they're depended on by the following installed dists:\n");
         for my $dep (@deps) {
             $self->puts("  $dep");
         }
@@ -259,7 +259,7 @@ sub ask_permission {
         $default = 'n';
     }
 
-    return lc($self->prompt("Are you sure to uninstall $dist?", $default)) eq 'y';
+    return lc($self->prompt("Are you sure you want to uninstall $dist?", $default)) eq 'y';
 }
 
 sub find_deps {
@@ -330,7 +330,7 @@ sub setup_local_lib {
     return unless $self->{local_lib};
 
     unless (-d $self->{local_lib}) {
-        $self->puts(colored ['red'], "! $self->{local_lib} is no such directory");
+        $self->puts(colored ['red'], "! $self->{local_lib} : no such directory");
         exit 1;
     }
 
@@ -364,7 +364,7 @@ sub install_base_arch_path {
 
 sub fetch {
     my ($self, $url) = @_;
-    $self->puts("-> Getting from $url") if $self->{verbose};
+    $self->puts("-> Fetching from $url") if $self->{verbose};
     my $res = HTTP::Tiny->new->get($url);
     return if $res->{status} == 404;
     die "[$res->{status}] fetch $url failed!!\n" if !$res->{success};
@@ -393,8 +393,8 @@ Usage:
       options:
           -v,--verbose                  Turns on chatty output
           -f,--force                    Uninstalls without prompts
-          -c,--checkdeps                Check dependencies ( default on )
-          -n,--no-checkdeps             Not check dependencies
+          -c,--checkdeps                Check dependencies (defaults to on)
+          -n,--no-checkdeps             Don't check dependencies
           -q,--quiet                    Suppress some messages
           -h,--help                     This help message
           -V,--version                  Show version
@@ -437,7 +437,7 @@ App::pmuninstall - Uninstall modules
 
 =head1 DESCRIPTION
 
-App::pmuninstall is Fast module uninstaller.
+App::pmuninstall is a fast module uninstaller.
 delete files from B<.packlist>.
 
 L<App::cpanminus> and, L<App::cpanoutdated> with a high affinity.
@@ -472,7 +472,7 @@ Check dependencies ( default on )
 
 =item -n, --no-checkdeps
 
-Not check dependencies
+Don't check dependencies
 
   $ pm-uninstall -n LWP
 
