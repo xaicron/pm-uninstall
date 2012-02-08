@@ -1,5 +1,8 @@
 Revision history for Perl extension App::pmuninstall
 
+0.29    Wed Feb  8 17:23:05 2012
+        - Copy and wording fixes (finn++)
+
 0.28    Wed Dec  7 01:11:32 2011
         - fixed issue: https://github.com/xaicron/pm-uninstall/issues/2 (finn++)
 
