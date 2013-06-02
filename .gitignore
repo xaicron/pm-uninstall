@@ -10,3 +10,10 @@ MANIFEST
 MANIFEST.bak
 MYMETA.*
 *.sw[po]
+/App-pmuninstall-*
+/.build
+/_build_params
+/Build
+!Build/
+!META.json
+!LICENSE

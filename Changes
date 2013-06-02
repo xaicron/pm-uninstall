@@ -1,5 +1,7 @@
 Revision history for Perl extension App::pmuninstall
 
+{{$NEXT}}
+
 0.29    Wed Feb  8 17:23:05 2012
         - Copy and wording fixes (finn++)
 

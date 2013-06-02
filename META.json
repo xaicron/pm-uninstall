@@ -1,0 +1,80 @@
+{
+   "abstract" : "Uninstall modules",
+   "author" : [
+      "Yuji Shimada"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.3, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-pmuninstall",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0",
+            "ExtUtils::Install" : "1.43",
+            "ExtUtils::MakeMaker" : "6.3",
+            "HTTP::Tiny" : "0.012",
+            "JSON::PP" : "2.01",
+            "Module::CoreList" : "0",
+            "YAML" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/pm-uninstall/issues"
+      },
+      "homepage" : "https://github.com/xaicron/pm-uninstall",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xaicron/pm-uninstall.git",
+         "web" : "https://github.com/xaicron/pm-uninstall"
+      }
+   },
+   "version" : "0.29",
+   "x_contributors" : [
+      "Finn Smith <finn@buzzfeed.com>",
+      "Finn Smith <finn@timeghost.net>",
+      "Yuji Shimada <xaicron{ at }gmail.com>",
+      "xaicron <xaicron@gmail.com>"
+   ]
+}
