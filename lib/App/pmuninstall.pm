@@ -336,6 +336,7 @@ sub setup_local_lib {
 
     local $SIG{__WARN__} = sub { }; # catch 'Attempting to write ...'
     $self->{inc} = [
+        grep { defined }
         map { Cwd::realpath($_) }
             @{$self->build_active_perl5lib($self->{local_lib}, $self->{self_contained})}
     ];
