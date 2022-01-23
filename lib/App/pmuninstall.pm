@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Basename qw(dirname);
+use ExtUtils::Packlist;
 use Getopt::Long qw(GetOptions :config bundling);
 use Config;
 use YAML ();
@@ -293,8 +294,8 @@ sub fixup_packlist {
     my ($self, $packlist) = @_;
     my @target_list;
     my $is_local_lib = $self->is_local_lib($packlist);
-    open my $in, "<", $packlist or die "$packlist: $!";
-    while (defined (my $file = <$in>)) {
+    my $plist = ExtUtils::Packlist->new($packlist);
+    while (my $file = each %$plist) {
         if ($is_local_lib) {
             next unless $self->is_local_lib($file);
         }
