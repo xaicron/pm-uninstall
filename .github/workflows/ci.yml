@@ -1,0 +1,107 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+
+jobs:
+  dist:
+    name: Make distribution
+    runs-on: ubuntu-latest
+    outputs:
+      dist-archive-name: ${{ steps.dist-archive.outputs.archive-name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: 'latest'
+          install-modules-with: cpanm
+          install-modules: |
+            Minilla
+            Test::Perl::Critic
+            Test::CPAN::Meta
+            Test::MinimumVersion::Fast
+            Test::PAUSE::Permissions
+            Test::Pod
+            Test::Spellunker
+      - name: Perl version
+        run: |
+          perl -v
+
+      - name: Make distribution
+        run: |
+          minil dist
+      - name: Find archive name
+        id: dist-archive
+        run: |
+          echo -n "::set-output name=archive-name::"$(ls App-pmuninstall-*.tar.gz)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: ./App-pmuninstall-*.tar.gz
+  test:
+    needs: [ 'dist' ]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        perl: ['5']
+        include:
+          - { os: 'ubuntu-latest', perl: "5.8"  }
+          - { os: 'ubuntu-latest', perl: "5.14" }
+          - { os: 'ubuntu-latest', perl: "5.16" }
+          - { os: 'ubuntu-latest', perl: "5.20" }
+          - { os: 'ubuntu-latest', perl: "5.30" }
+          - { os: 'ubuntu-latest', perl: "5.32" }
+          - { os: 'ubuntu-latest', perl: "5.34" }
+    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
+
+    steps:
+      - name: Get dist artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        if: runner.os != 'Windows'
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Set up perl (Strawberry)
+        uses: shogo82148/actions-setup-perl@v1
+        if: runner.os == 'Windows'
+        with:
+          distribution: 'strawberry'
+
+      - run: perl -V
+
+      - name: Install Perl deps
+        run: |
+          cpanm --notest --installdeps ${{ needs.dist.outputs.dist-archive-name }}
+
+      - name: Run tests
+        env:
+          AUTHOR_TESTING: 1
+        run: |
+          cpanm -nq Test::More
+          cpanm --test-only ${{ needs.dist.outputs.dist-archive-name }}
+
+      - name: Install and uninstall
+        run: |
+          cpanm -n ${{ needs.dist.outputs.dist-archive-name }}
+          echo "::group::Install test module"
+          cpanm -l my-local Acme::Bleach
+          perl -MFile::Find -e 'find( sub { print q|  > |, $File::Find::name, qq|\n| }, $ARGV[0] )' my-local
+          perl -e 'exit !  -f $ARGV[0]' my-local/lib/perl5/Acme/Bleach.pm
+          echo "::endgroup::"
+          echo "::group::Uninstall test module"
+          pm-uninstall -fn -l my-local Acme::Bleach
+          perl -MFile::Find -e 'find( sub { print q|  > |, $File::Find::name, qq|\n| }, $ARGV[0] )' my-local
+          perl -e 'exit !! -f $ARGV[0]' my-local/lib/perl5/Acme/Bleach.pm
+          echo "::endgroup::"
