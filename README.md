@@ -5,9 +5,9 @@ App::pmuninstall - Uninstall modules
 # DESCRIPTION
 
 App::pmuninstall is a fast module uninstaller.
-delete files from __.packlist__.
+delete files from **.packlist**.
 
-[App::cpanminus](http://search.cpan.org/perldoc?App::cpanminus) and, [App::cpanoutdated](http://search.cpan.org/perldoc?App::cpanoutdated) with a high affinity.
+[App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus) and, [App::cpanoutdated](https://metacpan.org/pod/App%3A%3Acpanoutdated) with a high affinity.
 
 # SYNOPSIS
 
@@ -17,55 +17,55 @@ uninstall MODULE
 
 # OPTIONS
 
-- \-f, --force
+- -f, --force
 
     Uninstalls without prompts
 
         $ pm-uninstall -f App::pmuninstall
 
-- \-v, --verbose
+- -v, --verbose
 
     Turns on chatty output
 
         $ pm-uninstall -v App::cpnaminus
 
-- \-c, --checkdeps
+- -c, --checkdeps
 
     Check dependencies ( default on )
 
         $ pm-uninstall -c Plack
 
-- \-n, --no-checkdeps
+- -n, --no-checkdeps
 
     Don't check dependencies
 
         $ pm-uninstall -n LWP
 
-- \-q, --quiet
+- -q, --quiet
 
     Suppress some messages
 
         $ pm-uninstall -q Furl
 
-- \-h, --help
+- -h, --help
 
     Show help message
 
         $ pm-uninstall -h
 
-- \-V, --version
+- -V, --version
 
     Show version
 
         $ pm-uninstall -V
 
-- \-l, --local-lib
+- -l, --local-lib
 
     Additional module path
 
         $ pm-uninstall -l extlib App::pmuninstall
 
-- \-L, --local-lib-contained
+- -L, --local-lib-contained
 
     Additional module path (don't include non-core modules)
 
@@ -79,7 +79,7 @@ Tatsuhiko Miyagawa
 
 # SEE ALSO
 
-[pm-uninstall](http://search.cpan.org/perldoc?pm-uninstall)
+[pm-uninstall](https://metacpan.org/pod/pm-uninstall)
 
 # LICENSE
 
