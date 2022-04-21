@@ -10,3 +10,7 @@ requires 'version';
 on build => sub {
     requires 'ExtUtils::MakeMaker';
 };
+
+on develop => sub {
+    requires 'Test::Perl::Critic';
+};
