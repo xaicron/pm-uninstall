@@ -337,6 +337,7 @@ sub setup_local_lib {
 
     local $SIG{__WARN__} = sub { }; # catch 'Attempting to write ...'
     $self->{inc} = [
+        grep { defined }
         map { Cwd::realpath($_) }
             @{$self->build_active_perl5lib($self->{local_lib}, $self->{self_contained})}
     ];
@@ -348,7 +349,7 @@ sub build_active_perl5lib {
     my $perl5libs = [
         $self->install_base_arch_path($path),
         $self->install_base_perl_path($path),
-        $interpolate && $ENV{PERL5LIB} ? $ENV{PERL5LIB} : (),
+        $interpolate && $ENV{PERL5LIB} ? split(/\Q$Config{path_sep}\E/, $ENV{PERL5LIB}) : (),
     ];
     return $perl5libs;
 }
