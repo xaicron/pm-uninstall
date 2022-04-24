@@ -14,7 +14,7 @@ use Term::ANSIColor qw(colored);
 use Cwd ();
 use JSON::PP qw(decode_json);
 
-our $VERSION = "0.30";
+our $VERSION = "0.31";
 
 my $perl_version     = version->new($])->numify;
 my $depended_on_by   = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';

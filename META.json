@@ -41,6 +41,7 @@
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -70,13 +71,15 @@
          "web" : "https://github.com/xaicron/pm-uninstall"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_contributors" : [
       "Finn Smith <finn@buzzfeed.com>",
       "Finn Smith <finn@timeghost.net>",
+      "Tina Mueller <tina.mueller@strato-rz.de>",
+      "Yuji Shimada <xaicron@gmail.com>",
       "Yuji Shimada <xaicron{ at }gmail.com>",
-      "xaicron <xaicron@gmail.com>"
+      "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.06",
-   "x_static_install" : 0
+   "x_static_install" : 1
 }
