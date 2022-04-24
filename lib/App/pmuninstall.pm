@@ -308,8 +308,7 @@ sub is_local_lib {
     my ($self, $file) = @_;
     return unless $self->{local_lib};
 
-    my $local_lib_base = quotemeta File::Spec->canonpath(Cwd::realpath($self->{local_lib}));
-    $file = File::Spec->canonpath($file);
+    my $local_lib_base = quotemeta Cwd::realpath($self->{local_lib});
     $file = Cwd::realpath($file);
 
     return $file =~ /^$local_lib_base/ ? 1 : 0;
