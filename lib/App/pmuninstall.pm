@@ -304,12 +304,24 @@ sub fixup_packlist {
     return @target_list;
 }
 
+# NOTE only use this for comparing paths
+sub _canon_path_compare {
+    my ($self, $path) = @_;
+    $path = Cwd::realpath($path);
+    if( $^O eq 'MSWin32' ) {
+        require Win32;
+        $path = Win32::GetLongPathName($path);
+    }
+
+    return $path;
+}
+
 sub is_local_lib {
     my ($self, $file) = @_;
     return unless $self->{local_lib};
 
-    my $local_lib_base = quotemeta File::Spec->canonpath(Cwd::realpath($self->{local_lib}));
-    $file = File::Spec->canonpath(Cwd::realpath($file));
+    my $local_lib_base = quotemeta $self->_canon_path_compare($self->{local_lib});
+    $file = $self->_canon_path_compare($file);
 
     return $file =~ /^$local_lib_base/ ? 1 : 0;
 }
