@@ -309,7 +309,8 @@ sub is_local_lib {
     return unless $self->{local_lib};
 
     my $local_lib_base = quotemeta File::Spec->catfile(Cwd::realpath($self->{local_lib}));
-    $file = File::Spec->catfile(Cwd::realpath($file));
+    $file = File::Spec->catfile($file);
+    $file = Cwd::realpath($file);
 
     return $file =~ /^$local_lib_base/ ? 1 : 0;
 }
