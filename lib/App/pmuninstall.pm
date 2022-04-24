@@ -323,7 +323,7 @@ sub is_local_lib {
     my $local_lib_base = quotemeta $self->_canon_path_compare($self->{local_lib});
     $file = $self->_canon_path_compare($file);
 
-    return $file =~ /^$local_lib_base/ ? 1 : 0;
+    return $file =~ /^$local_lib_base(?:\/|\z)/ ? 1 : 0;
 }
 
 sub vname_for {
