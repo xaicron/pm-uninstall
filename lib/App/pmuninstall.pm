@@ -73,7 +73,7 @@ sub uninstall {
         $self->puts("--> Working on $module") unless $self->{quiet};
         my ($packlist, $dist, $vname) = $self->find_packlist($module);
 
-        $packlist = File::Spec->catfile($packlist);
+        $packlist = File::Spec->canonpath($packlist);
         if ($self->is_core_module($module, $packlist)) {
             $self->puts(colored ['red'], "! $module is a core module!! Can't be uninstalled.");
             $self->puts unless $self->{quiet};
@@ -116,7 +116,7 @@ sub uninstall_from_packlist {
     my ($self, $packlist) = @_;
 
     my $inc = {
-        map { File::Spec->catfile($_) => 1 } @{$self->{inc}}
+        map { File::Spec->canonpath($_) => 1 } @{$self->{inc}}
     };
 
     my $failed;
@@ -144,7 +144,7 @@ sub rm_empty_dir_from_file {
     my ($self, $file, $inc) = @_;
     my $dir = dirname $file;
     return unless -d $dir;
-    return if $inc->{+File::Spec->catfile($dir)};
+    return if $inc->{+File::Spec->canonpath($dir)};
 
     my $failed;
     if ($self->is_empty_dir($dir)) {
@@ -308,8 +308,8 @@ sub is_local_lib {
     my ($self, $file) = @_;
     return unless $self->{local_lib};
 
-    my $local_lib_base = quotemeta File::Spec->catfile(Cwd::realpath($self->{local_lib}));
-    $file = File::Spec->catfile($file);
+    my $local_lib_base = quotemeta File::Spec->canonpath(Cwd::realpath($self->{local_lib}));
+    $file = File::Spec->canonpath($file);
     $file = Cwd::realpath($file);
 
     return $file =~ /^$local_lib_base/ ? 1 : 0;
