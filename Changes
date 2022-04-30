@@ -2,6 +2,9 @@ Revision history for Perl extension App::pmuninstall
 
 {{$NEXT}}
 
+0.33 2022-04-30T08:53:39Z
+        - Fixed #11 Win32 local_lib path problem (zmughal++)
+
 0.31 2022-04-24T13:02:35Z
         - Fixed #6 local_lib path problem (perlpunk++)
         - Fixed #7 Did not work on multiple paths in PERL5LIB (zmughal++)
